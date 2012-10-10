@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Sockets;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace ReactiveIRC.Connection
 {
-    public class IRCConnection : IDisposable
+    public class RawConnection : IDisposable
     {
         private TcpClient _socket = new TcpClient();
         private Subject<String> _rawMessages = new Subject<String>();
@@ -17,7 +18,7 @@ namespace ReactiveIRC.Connection
         public ushort Port { get; private set; }
         public IObservable<String> RawMessages { get { return _rawMessages; } }
 
-        public IRCConnection(String address, ushort port)
+        public RawConnection(String address, ushort port)
         {
             if(String.IsNullOrEmpty(address))
                 throw new ArgumentNullException("address");
@@ -28,7 +29,8 @@ namespace ReactiveIRC.Connection
 
         public void Dispose()
         {
-            Disconnected();
+            if(_socket.Connected)
+                Disconnected();
         }
 
         public IObservable<Unit> Connect()
@@ -53,13 +55,18 @@ namespace ReactiveIRC.Connection
                 ;
         }
 
-        private void Write(String message)
+        public IObservable<Unit> WriteRaw(String message)
         {
             byte[] data = Encoding.UTF8.GetBytes(message + Environment.NewLine);
-            _socket.Client
+            return _socket.Client
                 .SendObservable(data, 0, data.Length, SocketFlags.None)
-                .Subscribe()
+                .Select(_ => Unit.Default)
                 ;
+        }
+
+        public IObservable<Unit> WriteRaw(params String[] messages)
+        {
+            return Observable.Merge(messages.Select(m => WriteRaw(m)));
         }
 
         private void Connected()
@@ -69,11 +76,8 @@ namespace ReactiveIRC.Connection
                 .Scan(String.Empty, (a, b) => (a.EndsWith("\r\n") ? "" : a) + b)
                 .Where(x => x.EndsWith("\r\n"))
                 .Select(b => String.Join("", b).Replace("\n", ""))
-                .Subscribe(_rawMessages);
+                .Subscribe(_rawMessages)
                 ;
-
-            Write("USER Gohla swivvet.com  swivvet.com :Gohla");
-            Write("NICK Gohla");
         }
 
         private void ConnectedError(Exception e)

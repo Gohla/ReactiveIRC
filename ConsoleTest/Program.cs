@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using ReactiveIRC.Connection;
 
 namespace ReactiveIRC.ConsoleTest
@@ -14,7 +10,11 @@ namespace ReactiveIRC.ConsoleTest
         {
             IRCConnection connection = new IRCConnection(args[0], Convert.ToUInt16(args[1]));
             connection.RawMessages.Subscribe(s => Console.WriteLine(s));
-            connection.Connect().Subscribe(_ => { }, e => Console.WriteLine(e.Message), () => Console.WriteLine("Connected!"));
+            connection.Connect().Subscribe(
+                _ => Console.WriteLine("Connected!"),
+                e => Console.WriteLine(e.Message),
+                () => connection.Login(args[2], args[3], args[4], args[5]).Subscribe(_ => { }, () => Console.WriteLine("Logged in!"))
+            );
 
             while(true)
             {
