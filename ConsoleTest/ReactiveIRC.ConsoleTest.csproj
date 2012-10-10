@@ -62,6 +62,20 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Client\ReactiveIRC.Client.csproj">
+      <Project>{7922535f-8aeb-4b17-b558-801ee543805f}</Project>
+      <Name>ReactiveIRC.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Command\ReactiveIRC.Command.csproj">
+      <Project>{3a9061fb-e286-402e-b4ec-30c7bc8fea64}</Project>
+      <Name>ReactiveIRC.Command</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Connection\ReactiveIRC.Connection.csproj">
+      <Project>{84ad60ca-b25f-4125-8730-a1c69c26808e}</Project>
+      <Name>ReactiveIRC.Connection</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
