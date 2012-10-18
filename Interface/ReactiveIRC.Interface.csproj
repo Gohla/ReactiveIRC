@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}</ProjectGuid>
+    <ProjectGuid>{C699BFFA-5FE2-441C-9679-59BEAD165BC6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ReactiveIRC.Protocol</RootNamespace>
-    <AssemblyName>ReactiveIRC.Protocol</AssemblyName>
+    <RootNamespace>ReactiveIRC.Interface</RootNamespace>
+    <AssemblyName>ReactiveIRC.Interface</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,7 +22,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,7 +30,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Gohla.Shared">
@@ -58,8 +54,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IChannel.cs" />
+    <Compile Include="IChannelUser.cs" />
+    <Compile Include="IConnection.cs" />
+    <Compile Include="IIdentity.cs" />
+    <Compile Include="IMessage.cs" />
+    <Compile Include="IMessageTarget.cs" />
+    <Compile Include="INetwork.cs" />
+    <Compile Include="IReceiveMessage.cs" />
+    <Compile Include="ISendMessage.cs" />
+    <Compile Include="IUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rfc2812.cs" />
+    <Compile Include="ReceiveMessageType.cs" />
+    <Compile Include="SendMessageType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

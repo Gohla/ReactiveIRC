@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ReactiveIRC.Command
+namespace ReactiveIRC.Protocol
 {
     public static class Rfc2812
     {

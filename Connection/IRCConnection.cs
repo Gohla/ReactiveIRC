@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reactive;
-using ReactiveIRC.Command;
+using ReactiveIRC.Protocol;
 
 namespace ReactiveIRC.Connection
 {

@@ -10,7 +10,6 @@
 .cache
 
 /packages
-
 !.nuget/nuget.exe
 
 /Client/obj
@@ -19,5 +18,7 @@
 /Protocol/bin/
 /Connection/obj
 /Connection/bin/
+/Interface/obj
+/Interface/bin/
 /ConsoleTest/obj
 /ConsoleTest/bin/

@@ -35,6 +35,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Gohla.Shared">
+      <HintPath>..\packages\Gohla.Shared.1.0.4674.36846\lib\net40-Client\Gohla.Shared.dll</HintPath>
+    </Reference>
     <Reference Include="Rxx">
       <HintPath>..\..\rxx\Source\Rxx\bin\Debug\Rxx.dll</HintPath>
     </Reference>
