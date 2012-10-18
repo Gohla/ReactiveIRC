@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveIRC.Command", "Command\ReactiveIRC.Command.csproj", "{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveIRC.Connection", "Connection\ReactiveIRC.Connection.csproj", "{84AD60CA-B25F-4125-8730-A1C69C26808E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveIRC.Client", "Client\ReactiveIRC.Client.csproj", "{7922535F-8AEB-4B17-B558-801EE543805F}"
@@ -21,16 +19,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6EE974
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveIRC.Protocol", "Protocol\ReactiveIRC.Protocol.csproj", "{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}.Release|Any CPU.Build.0 = Release|Any CPU
 		{84AD60CA-B25F-4125-8730-A1C69C26808E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{84AD60CA-B25F-4125-8730-A1C69C26808E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84AD60CA-B25F-4125-8730-A1C69C26808E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -43,14 +39,18 @@ Global
 		{6D98E458-31CE-4616-AC0B-DA8F1C6E3088}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D98E458-31CE-4616-AC0B-DA8F1C6E3088}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D98E458-31CE-4616-AC0B-DA8F1C6E3088}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A9061FB-E286-402E-B4EC-30C7BC8FEA64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{84AD60CA-B25F-4125-8730-A1C69C26808E} = {2FBEB532-5E88-47F2-8C0F-4B8F8A4EEB42}
 		{7922535F-8AEB-4B17-B558-801EE543805F} = {2FBEB532-5E88-47F2-8C0F-4B8F8A4EEB42}
 		{3A9061FB-E286-402E-B4EC-30C7BC8FEA64} = {2FBEB532-5E88-47F2-8C0F-4B8F8A4EEB42}
-		{84AD60CA-B25F-4125-8730-A1C69C26808E} = {2FBEB532-5E88-47F2-8C0F-4B8F8A4EEB42}
 		{6D98E458-31CE-4616-AC0B-DA8F1C6E3088} = {AA3AE54A-B6FE-4DB9-83C7-41FA1B29C217}
 	EndGlobalSection
 EndGlobal

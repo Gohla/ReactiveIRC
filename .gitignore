@@ -15,8 +15,8 @@
 
 /Client/obj
 /Client/bin/
-/Command/obj
-/Command/bin/
+/Protocol/obj
+/Protocol/bin/
 /Connection/obj
 /Connection/bin/
 /ConsoleTest/obj
