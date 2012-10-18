@@ -26,8 +26,8 @@ namespace ReactiveIRC.Connection
         {
             return WriteRaw
             (
-                Rfc2812.Nick(nickname)
-              , Rfc2812.User(username, 0, realname)
+                MessageSender.Nick(nickname)
+              , MessageSender.User(username, 0, realname)
             );
         }
 
@@ -35,9 +35,9 @@ namespace ReactiveIRC.Connection
         {
             return WriteRaw
             (
-                Rfc2812.Pass(password)
-              , Rfc2812.Nick(nickname)
-              , Rfc2812.User(username, 0, realname)
+                MessageSender.Pass(password)
+              , MessageSender.Nick(nickname)
+              , MessageSender.User(username, 0, realname)
             );
         }
     }

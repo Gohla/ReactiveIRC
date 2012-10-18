@@ -35,9 +35,19 @@ namespace ReactiveIRC.Interface
         IObservableCollection<IUser> Users { get; }
 
         /// <summary>
-        /// Gets an observable stream of messages.
+        /// Gets an observable stream of all received and sent messages.
         /// </summary>
         IObservable<IMessage> Messages { get; }
+
+        /// <summary>
+        /// Gets an observable stream of all received messages from the server.
+        /// </summary>
+        IObservable<IReceiveMessage> ReceivedMessages { get; }
+
+        /// <summary>
+        /// Gets an observable stream of all sent messages by the client.
+        /// </summary>
+        IObservable<ISendMessage> SentMessages { get; }
 
         /// <summary>
         /// Connects to the server.

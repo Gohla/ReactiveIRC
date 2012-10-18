@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ReactiveIRC.Interface
 {
@@ -13,18 +14,8 @@ namespace ReactiveIRC.Interface
         IConnection Connection { get; }
 
         /// <summary>
-        /// Gets the sender of the message.
+        /// Gets the receivers of the message. If empty, receiver is global.
         /// </summary>
-        IMessageTarget Sender { get; }
-
-        /// <summary>
-        /// Gets the receiver of the message.
-        /// </summary>
-        IMessageTarget Receiver { get; }
-
-        /// <summary>
-        /// Gets the message string.
-        /// </summary>
-        String Message { get; }
+        ICollection<IMessageTarget> Receivers { get; }
     }
 }

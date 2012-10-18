@@ -9,13 +9,28 @@ namespace ReactiveIRC.Interface
     public interface IChannel : IMessageTarget, IComparable<IChannel>, IEquatable<IChannel>
     {
         /// <summary>
-        /// Gets an observable stream of topics. Sends value on subscribe.
+        /// Gets an observable stream of received and sent messages for this channel.
         /// </summary>
-        IObservable<String> Topic { get; }
+        IObservable<IMessage> Messages { get; }
+
+        /// <summary>
+        /// Gets an observable stream of received messages for this channel from the server.
+        /// </summary>
+        IObservable<IReceiveMessage> ReceivedMessages { get; }
+
+        /// <summary>
+        /// Gets an observable stream of all sent messages for this channel by the client.
+        /// </summary>
+        IObservable<ISendMessage> SentMessages { get; }
 
         /// <summary>
         /// Gets the users in this channel.
         /// </summary>
         IObservableCollection<IChannelUser> Users { get; }
+
+        /// <summary>
+        /// Gets an observable stream of topics. Sends current value on subscribe.
+        /// </summary>
+        IObservable<String> Topic { get; }
     }
 }
