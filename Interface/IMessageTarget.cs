@@ -1,4 +1,6 @@
-﻿namespace ReactiveIRC.Interface
+﻿using Gohla.Shared;
+
+namespace ReactiveIRC.Interface
 {
     /// <summary>
     /// Values that represent message target types.
@@ -15,7 +17,7 @@
     /// <summary>
     /// Interface representing a message target (sender or receiver)
     /// </summary>
-    public interface IMessageTarget
+    public interface IMessageTarget : IKeyedObject<IIdentity>
     {
         /// <summary>
         /// Gets the connection this target belongs to.

@@ -10,7 +10,7 @@ namespace ReactiveIRC.Interface
         /// <summary>
         /// Gets the name.
         /// </summary>
-        String Name { get; }
+        String Name { get; set; }
 
         /// <summary>
         /// Gets the identifier.
@@ -21,6 +21,16 @@ namespace ReactiveIRC.Interface
         /// Gets the host.
         /// </summary>
         String Host { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this identity has a name.
+        /// </summary>
+        bool HasName { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this identity has an ident.
+        /// </summary>
+        bool HasIdent { get; }
 
         /// <summary>
         /// Queries if this identity will be compared by Name instead of Ident and Host.

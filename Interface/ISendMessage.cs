@@ -15,6 +15,6 @@ namespace ReactiveIRC.Interface
         /// <summary>
         /// Gets the type of the message.
         /// </summary>
-        SendMessageType Type { get; }
+        SendType Type { get; }
     }
 }

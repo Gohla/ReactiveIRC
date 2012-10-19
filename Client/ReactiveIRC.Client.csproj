@@ -61,9 +61,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Channel.cs" />
+    <Compile Include="ChannelUser.cs" />
     <Compile Include="IRCClientConnection.cs" />
+    <Compile Include="Network.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RawClientConnection.cs" />
+    <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

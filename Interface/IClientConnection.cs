@@ -30,9 +30,19 @@ namespace ReactiveIRC.Interface
         IObservableCollection<IChannel> Channels { get; }
 
         /// <summary>
-        /// Gets the users the current user can see.
+        /// Gets the users that are visible through channels.
         /// </summary>
         IObservableCollection<IUser> Users { get; }
+
+        /// <summary>
+        /// Gets the known channels. Can contain invalid channels.
+        /// </summary>
+        IObservableCollection<IChannel> KnownChannels { get; }
+
+        /// <summary>
+        /// Gets the known users. Can contain invalid users.
+        /// </summary>
+        IObservableCollection<IUser> KnownUsers { get; }
 
         /// <summary>
         /// Gets an observable stream of all received and sent messages.
@@ -105,25 +115,24 @@ namespace ReactiveIRC.Interface
         INetwork GetNetwork(String network);
 
         /// <summary>
-        /// Gets the channel with given name. Returns null if the channel cannot be found.
+        /// Gets the channel with given name. If channel was not known before, it is added to the known channels.
         /// </summary>
         ///
-        /// <param name="channel">The channel name.</param>
-        ///
-        /// <returns>
-        /// The channel or null if it cannot be found.
-        /// </returns>
+        /// <param name="channel">The name of the channel.</param>
         IChannel GetChannel(String channel);
 
         /// <summary>
-        /// Gets the user with given nickname. Returns null if the user cannot be found.
+        /// Gets the user with given nickname.  If user was not known before, it is added to the known users.
         /// </summary>
         ///
         /// <param name="nickname">The nickname of the user.</param>
-        ///
-        /// <returns>
-        /// The user or null if they cannot be found.
-        /// </returns>
         IUser GetUser(String nickname);
+
+        /// <summary>
+        /// Gets the user with given identity.  If user was not known before, it is added to the known users.
+        /// </summary>
+        ///
+        /// <param name="identity">The identity of the user.</param>
+        IUser GetUser(IIdentity identity);
     }
 }

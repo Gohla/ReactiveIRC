@@ -3,10 +3,29 @@
     /// <summary>
     /// Values that represent the type of a received message.
     /// </summary>
-    public enum ReceiveMessageType
+    public enum ReceiveType
     {
-        Unknown             // Sender types                     -> Receiver types
+        Unknown
 
+      // Server information messages.
+      , Ping
+      , Login
+      , Info
+      , Motd
+      , Name
+      , List
+      , Topic
+      , UserMode
+      , ChannelMode
+      , BanList
+      , Who
+      , WhoIs
+      , WhoWas
+      , Error
+
+      // User interaction messages.
+
+                            // Sender types                     -> Receiver types
       , Message	            // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
       , Action              // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
       , Notice              // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 

@@ -76,7 +76,7 @@ namespace ReactiveIRC.Client
                 .SelectMany(x => Encoding.UTF8.GetString(x).ToCharArray())
                 .Scan(String.Empty, (a, b) => (a.EndsWith("\r\n") ? "" : a) + b)
                 .Where(x => x.EndsWith("\r\n"))
-                .Select(b => String.Join("", b).Replace("\n", ""))
+                .Select(b => String.Join("", b).Replace("\r\n", ""))
                 .Subscribe(_rawMessages)
                 ;
         }

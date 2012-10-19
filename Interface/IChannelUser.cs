@@ -1,4 +1,5 @@
 ﻿using System;
+using Gohla.Shared;
 
 namespace ReactiveIRC.Interface
 {
@@ -18,7 +19,7 @@ namespace ReactiveIRC.Interface
     /// <summary>
     /// Interface representing a user on a certain channel.
     /// </summary>
-    public interface IChannelUser : IMessageTarget, IComparable<IChannel>, IEquatable<IChannel>, IComparable<IUser>,
+    public interface IChannelUser : IMessageTarget, IKeyedObject<String>, IComparable<IChannel>, IEquatable<IChannel>, IComparable<IUser>,
         IEquatable<IUser>, IComparable<IChannelUser>, IEquatable<IChannelUser>
     {
         /// <summary>
@@ -34,6 +35,6 @@ namespace ReactiveIRC.Interface
         /// <summary>
         /// Gets a the user modes that the user has on the channel.
         /// </summary>
-        UserMode UserModes { get; }
+        IObservable<UserMode> UserModes { get; }
     }
 }

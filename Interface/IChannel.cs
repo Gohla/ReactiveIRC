@@ -6,7 +6,7 @@ namespace ReactiveIRC.Interface
     /// <summary>
     /// Interface representing channels on an IRC server.
     /// </summary>
-    public interface IChannel : IMessageTarget, IComparable<IChannel>, IEquatable<IChannel>
+    public interface IChannel : IMessageTarget, IComparable<IChannel>, IEquatable<IChannel>, IKeyedObject<String>
     {
         /// <summary>
         /// Gets an observable stream of received and sent messages for this channel.

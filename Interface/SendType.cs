@@ -3,7 +3,7 @@
     /// <summary>
     /// Values that represent the type of a sent message.
     /// </summary>
-    public enum SendMessageType
+    public enum SendType
     {
         Pass
       , Nick

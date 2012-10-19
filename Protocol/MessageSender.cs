@@ -17,51 +17,51 @@ namespace ReactiveIRC.Protocol
 
         public SendMessage Pass(String password)
         {
-            return new SendMessage(Connection, "PASS " + password, SendMessageType.Pass);
+            return new SendMessage(Connection, "PASS " + password, SendType.Pass);
         }
 
         public SendMessage Nick(String nickname)
         {
-            return new SendMessage(Connection, "NICK " + nickname, SendMessageType.Nick);
+            return new SendMessage(Connection, "NICK " + nickname, SendType.Nick);
         }
 
         public SendMessage User(String username, int usermode, String realname)
         {
             return new SendMessage(Connection, "USER " + username + " " + usermode.ToString() + " * :" + realname, 
-                SendMessageType.User);
+                SendType.User);
         }
 
         public SendMessage Oper(String name, String password)
         {
-            return new SendMessage(Connection, "OPER " + name + " " + password, SendMessageType.Oper);
+            return new SendMessage(Connection, "OPER " + name + " " + password, SendType.Oper);
         }
 
         public SendMessage Privmsg(IMessageTarget receiver, String message)
         {
             return new SendMessage(Connection, "PRIVMSG " + receiver.Identity.Name + " :" + message, 
-                SendMessageType.Privmsg, receiver);
+                SendType.Privmsg, receiver);
         }
 
         public SendMessage Notice(IMessageTarget receiver, String message)
         {
             return new SendMessage(Connection, "NOTICE " + receiver.Identity.Name + " :" + message, 
-                SendMessageType.Notice, receiver);
+                SendType.Notice, receiver);
         }
 
         public SendMessage Join(IChannel channel)
         {
-            return new SendMessage(Connection, "JOIN " + channel.Identity.Name, SendMessageType.Join, channel);
+            return new SendMessage(Connection, "JOIN " + channel.Identity.Name, SendType.Join, channel);
         }
 
         public SendMessage Join(params IChannel[] channels)
         {
             String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
-            return new SendMessage(Connection, "JOIN " + channellist, SendMessageType.Join, channels);
+            return new SendMessage(Connection, "JOIN " + channellist, SendType.Join, channels);
         }
 
         public SendMessage Join(IChannel channel, String key)
         {
-            return new SendMessage(Connection, "JOIN " + channel.Identity.Name + " " + key, SendMessageType.Join, 
+            return new SendMessage(Connection, "JOIN " + channel.Identity.Name + " " + key, SendType.Join, 
                 channel);
         }
 
@@ -69,44 +69,44 @@ namespace ReactiveIRC.Protocol
         {
             String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
             String keylist = String.Join(",", keys);
-            return new SendMessage(Connection, "JOIN " + channellist + " " + keylist, SendMessageType.Join, channels);
+            return new SendMessage(Connection, "JOIN " + channellist + " " + keylist, SendType.Join, channels);
         }
 
         public SendMessage Part(IChannel channel)
         {
-            return new SendMessage(Connection, "PART " + channel.Identity.Name, SendMessageType.Part, channel);
+            return new SendMessage(Connection, "PART " + channel.Identity.Name, SendType.Part, channel);
         }
 
         public SendMessage Part(params IChannel[] channels)
         {
             String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
-            return new SendMessage(Connection, "PART " + channellist, SendMessageType.Part, channels);
+            return new SendMessage(Connection, "PART " + channellist, SendType.Part, channels);
         }
 
         public SendMessage Part(IChannel channel, String partmessage)
         {
             return new SendMessage(Connection, "PART " + channel.Identity.Name + " :" + partmessage, 
-                SendMessageType.Part, channel);
+                SendType.Part, channel);
         }
 
         public SendMessage Part(String partmessage, params IChannel[] channels)
         {
             String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
-            return new SendMessage(Connection, "PART " + channellist + " :" + partmessage, SendMessageType.Part, 
+            return new SendMessage(Connection, "PART " + channellist + " :" + partmessage, SendType.Part, 
                 channels);
         }
 
         public SendMessage Kick(IChannelUser channelUser)
         {
             return new SendMessage(Connection, "KICK " + channelUser.Channel.Identity.Name + " " +
-                channelUser.User.Identity.Name, SendMessageType.Kick, channelUser);
+                channelUser.User.Identity.Name, SendType.Kick, channelUser);
         }
 
         public SendMessage Kick(IChannelUser channelUser, String comment)
         {
             return new SendMessage(Connection, "KICK " + channelUser.Channel.Identity.Name + " " 
                 + channelUser.User.Identity.Name + " :" + comment,
-                SendMessageType.Kick, channelUser);
+                SendType.Kick, channelUser);
         }
 
         /*public SendMessage Kick(String[] channels, String nickname)
@@ -139,7 +139,7 @@ namespace ReactiveIRC.Protocol
         {
             String channellist = String.Join(",", channelUsers.Select(c => c.Channel.Identity.Name));
             String nicknamelist = String.Join(",", channelUsers.Select(c => c.User.Identity.Name));
-            return new SendMessage(Connection, "KICK " + channellist + " " + nicknamelist, SendMessageType.Kick, 
+            return new SendMessage(Connection, "KICK " + channellist + " " + nicknamelist, SendType.Kick, 
                 channelUsers);
         }
 
@@ -148,220 +148,220 @@ namespace ReactiveIRC.Protocol
             String channellist = String.Join(",", channelUsers.Select(c => c.Channel.Identity.Name));
             String nicknamelist = String.Join(",", channelUsers.Select(c => c.User.Identity.Name));
             return new SendMessage(Connection, "KICK " + channellist + " " + nicknamelist + " :" + comment,
-                SendMessageType.Kick, channelUsers);
+                SendType.Kick, channelUsers);
         }
 
         public SendMessage Motd()
         {
-            return new SendMessage(Connection, "MOTD", SendMessageType.Motd);
+            return new SendMessage(Connection, "MOTD", SendType.Motd);
         }
 
         public SendMessage Motd(String target)
         {
-            return new SendMessage(Connection, "MOTD " + target, SendMessageType.Motd);
+            return new SendMessage(Connection, "MOTD " + target, SendType.Motd);
         }
 
         public SendMessage Lusers()
         {
-            return new SendMessage(Connection, "LUSERS", SendMessageType.Lusers);
+            return new SendMessage(Connection, "LUSERS", SendType.Lusers);
         }
 
         public SendMessage Lusers(String mask)
         {
-            return new SendMessage(Connection, "LUSER " + mask, SendMessageType.Lusers);
+            return new SendMessage(Connection, "LUSER " + mask, SendType.Lusers);
         }
 
         public SendMessage Lusers(String mask, String target)
         {
-            return new SendMessage(Connection, "LUSER " + mask + " " + target, SendMessageType.Lusers);
+            return new SendMessage(Connection, "LUSER " + mask + " " + target, SendType.Lusers);
         }
 
         public SendMessage Version()
         {
-            return new SendMessage(Connection, "VERSION", SendMessageType.Version);
+            return new SendMessage(Connection, "VERSION", SendType.Version);
         }
 
         public SendMessage Version(String target)
         {
-            return new SendMessage(Connection, "VERSION " + target, SendMessageType.Version);
+            return new SendMessage(Connection, "VERSION " + target, SendType.Version);
         }
 
         public SendMessage Stats()
         {
-            return new SendMessage(Connection, "STATS", SendMessageType.Stats);
+            return new SendMessage(Connection, "STATS", SendType.Stats);
         }
 
         public SendMessage Stats(String query)
         {
-            return new SendMessage(Connection, "STATS " + query, SendMessageType.Stats);
+            return new SendMessage(Connection, "STATS " + query, SendType.Stats);
         }
 
         public SendMessage Stats(String query, String target)
         {
-            return new SendMessage(Connection, "STATS " + query + " " + target, SendMessageType.Stats);
+            return new SendMessage(Connection, "STATS " + query + " " + target, SendType.Stats);
         }
 
         public SendMessage Links()
         {
-            return new SendMessage(Connection, "LINKS", SendMessageType.Links);
+            return new SendMessage(Connection, "LINKS", SendType.Links);
         }
 
         public SendMessage Links(String servermask)
         {
-            return new SendMessage(Connection, "LINKS " + servermask, SendMessageType.Links);
+            return new SendMessage(Connection, "LINKS " + servermask, SendType.Links);
         }
 
         public SendMessage Links(String remoteserver, String servermask)
         {
-            return new SendMessage(Connection, "LINKS " + remoteserver + " " + servermask, SendMessageType.Links);
+            return new SendMessage(Connection, "LINKS " + remoteserver + " " + servermask, SendType.Links);
         }
 
         public SendMessage Time()
         {
-            return new SendMessage(Connection, "TIME", SendMessageType.Time);
+            return new SendMessage(Connection, "TIME", SendType.Time);
         }
 
         public SendMessage Time(String target)
         {
-            return new SendMessage(Connection, "TIME " + target, SendMessageType.Time);
+            return new SendMessage(Connection, "TIME " + target, SendType.Time);
         }
 
         public SendMessage Connect(String targetserver, String port)
         {
-            return new SendMessage(Connection, "CONNECT " + targetserver + " " + port, SendMessageType.Connect);
+            return new SendMessage(Connection, "CONNECT " + targetserver + " " + port, SendType.Connect);
         }
 
         public SendMessage Connect(String targetserver, String port, String remoteserver)
         {
             return new SendMessage(Connection, "CONNECT " + targetserver + " " + port + " " + remoteserver, 
-                SendMessageType.Connect);
+                SendType.Connect);
         }
 
         public SendMessage Trace()
         {
-            return new SendMessage(Connection, "TRACE", SendMessageType.Trace);
+            return new SendMessage(Connection, "TRACE", SendType.Trace);
         }
 
         public SendMessage Trace(String target)
         {
-            return new SendMessage(Connection, "TRACE " + target, SendMessageType.Trace);
+            return new SendMessage(Connection, "TRACE " + target, SendType.Trace);
         }
 
         public SendMessage Admin()
         {
-            return new SendMessage(Connection, "ADMIN", SendMessageType.Admin);
+            return new SendMessage(Connection, "ADMIN", SendType.Admin);
         }
 
         public SendMessage Admin(String target)
         {
-            return new SendMessage(Connection, "ADMIN " + target, SendMessageType.Admin);
+            return new SendMessage(Connection, "ADMIN " + target, SendType.Admin);
         }
 
         public SendMessage Info()
         {
-            return new SendMessage(Connection, "INFO", SendMessageType.Info);
+            return new SendMessage(Connection, "INFO", SendType.Info);
         }
 
         public SendMessage Info(String target)
         {
-            return new SendMessage(Connection, "INFO " + target, SendMessageType.Info);
+            return new SendMessage(Connection, "INFO " + target, SendType.Info);
         }
 
         public SendMessage Servlist()
         {
-            return new SendMessage(Connection, "SERVLIST", SendMessageType.Servlist);
+            return new SendMessage(Connection, "SERVLIST", SendType.Servlist);
         }
 
         public SendMessage Servlist(String mask)
         {
-            return new SendMessage(Connection, "SERVLIST " + mask, SendMessageType.Servlist);
+            return new SendMessage(Connection, "SERVLIST " + mask, SendType.Servlist);
         }
 
         public SendMessage Servlist(String mask, String type)
         {
-            return new SendMessage(Connection, "SERVLIST " + mask + " " + type, SendMessageType.Servlist);
+            return new SendMessage(Connection, "SERVLIST " + mask + " " + type, SendType.Servlist);
         }
 
         public SendMessage Squery(String servicename, String servicetext)
         {
-            return new SendMessage(Connection, "SQUERY " + servicename + " :" + servicetext, SendMessageType.Squery);
+            return new SendMessage(Connection, "SQUERY " + servicename + " :" + servicetext, SendType.Squery);
         }
 
         public SendMessage List()
         {
-            return new SendMessage(Connection, "LIST", SendMessageType.List);
+            return new SendMessage(Connection, "LIST", SendType.List);
         }
 
         public SendMessage List(IChannel channel)
         {
-            return new SendMessage(Connection, "LIST " + channel.Identity.Name, SendMessageType.List, channel);
+            return new SendMessage(Connection, "LIST " + channel.Identity.Name, SendType.List, channel);
         }
 
         public SendMessage List(IChannel[] channels)
         {
             String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
-            return new SendMessage(Connection, "LIST " + channellist, SendMessageType.List, channels);
+            return new SendMessage(Connection, "LIST " + channellist, SendType.List, channels);
         }
 
         public SendMessage List(IChannel channel, String target)
         {
-            return new SendMessage(Connection, "LIST " + channel.Identity.Name + " " + target, SendMessageType.List, 
+            return new SendMessage(Connection, "LIST " + channel.Identity.Name + " " + target, SendType.List, 
                 channel);
         }
 
         public SendMessage List(IChannel[] channels, String target)
         {
             String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
-            return new SendMessage(Connection, "LIST " + channellist + " " + target, SendMessageType.List, channels);
+            return new SendMessage(Connection, "LIST " + channellist + " " + target, SendType.List, channels);
         }
 
         public SendMessage Names()
         {
-            return new SendMessage(Connection, "NAMES", SendMessageType.Names);
+            return new SendMessage(Connection, "NAMES", SendType.Names);
         }
 
         public SendMessage Names(IChannel channel)
         {
-            return new SendMessage(Connection, "NAMES " + channel.Identity.Name, SendMessageType.Names, channel);
+            return new SendMessage(Connection, "NAMES " + channel.Identity.Name, SendType.Names, channel);
         }
 
         public SendMessage Names(IChannel[] channels)
         {
             String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
-            return new SendMessage(Connection, "NAMES " + channellist, SendMessageType.Names, channels);
+            return new SendMessage(Connection, "NAMES " + channellist, SendType.Names, channels);
         }
 
         public SendMessage Names(IChannel channel, String target)
         {
-            return new SendMessage(Connection, "NAMES " + channel.Identity.Name + " " + target, SendMessageType.Names, 
+            return new SendMessage(Connection, "NAMES " + channel.Identity.Name + " " + target, SendType.Names, 
                 channel);
         }
 
         public SendMessage Names(IChannel[] channels, String target)
         {
             String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
-            return new SendMessage(Connection, "NAMES " + channellist + " " + target, SendMessageType.Names, channels);
+            return new SendMessage(Connection, "NAMES " + channellist + " " + target, SendType.Names, channels);
         }
 
         public SendMessage Topic(IChannel channel)
         {
-            return new SendMessage(Connection, "TOPIC " + channel.Identity.Name, SendMessageType.Topic, channel);
+            return new SendMessage(Connection, "TOPIC " + channel.Identity.Name, SendType.Topic, channel);
         }
 
         public SendMessage Topic(IChannel channel, String newtopic)
         {
             return new SendMessage(Connection, "TOPIC " + channel.Identity.Name + " :" + newtopic, 
-                SendMessageType.Topic, channel);
+                SendType.Topic, channel);
         }
 
         public SendMessage Mode(String target)
         {
-            return new SendMessage(Connection, "MODE " + target, SendMessageType.Mode);
+            return new SendMessage(Connection, "MODE " + target, SendType.Mode);
         }
 
         public SendMessage Mode(String target, String newmode)
         {
-            return new SendMessage(Connection, "MODE " + target + " " + newmode, SendMessageType.Mode);
+            return new SendMessage(Connection, "MODE " + target + " " + newmode, SendType.Mode);
         }
 
         public SendMessage Mode(String target, String[] newModes, String[] newModeParameters)
@@ -427,211 +427,211 @@ namespace ReactiveIRC.Protocol
         public SendMessage Service(String nickname, String distribution, String info)
         {
             return new SendMessage(Connection, "SERVICE " + nickname + " * " + distribution + " * * :" + info, 
-                SendMessageType.Service);
+                SendType.Service);
         }
 
         public SendMessage Invite(IUser user, IChannel channel)
         {
             return new SendMessage(Connection, "INVITE " + user.Identity.Name + " " + channel.Identity.Name, 
-                SendMessageType.Invite, user);
+                SendType.Invite, user);
         }
 
         public SendMessage Who()
         {
-            return new SendMessage(Connection, "WHO", SendMessageType.Who);
+            return new SendMessage(Connection, "WHO", SendType.Who);
         }
 
         public SendMessage Who(String mask)
         {
-            return new SendMessage(Connection, "WHO " + mask, SendMessageType.Who);
+            return new SendMessage(Connection, "WHO " + mask, SendType.Who);
         }
 
         public SendMessage Who(String mask, bool ircop)
         {
             if(ircop)
-                return new SendMessage(Connection, "WHO " + mask + " o", SendMessageType.Who);
+                return new SendMessage(Connection, "WHO " + mask + " o", SendType.Who);
             else
-                return new SendMessage(Connection, "WHO " + mask, SendMessageType.Who);
+                return new SendMessage(Connection, "WHO " + mask, SendType.Who);
         }
 
         public SendMessage Whois(String mask)
         {
-            return new SendMessage(Connection, "WHOIS " + mask, SendMessageType.Whois);
+            return new SendMessage(Connection, "WHOIS " + mask, SendType.Whois);
         }
 
         public SendMessage Whois(String[] masks)
         {
             String masklist = String.Join(",", masks);
-            return new SendMessage(Connection, "WHOIS " + masklist, SendMessageType.Whois);
+            return new SendMessage(Connection, "WHOIS " + masklist, SendType.Whois);
         }
 
         public SendMessage Whois(String target, String mask)
         {
-            return new SendMessage(Connection, "WHOIS " + target + " " + mask, SendMessageType.Whois);
+            return new SendMessage(Connection, "WHOIS " + target + " " + mask, SendType.Whois);
         }
 
         public SendMessage Whois(String target, String[] masks)
         {
             String masklist = String.Join(",", masks);
-            return new SendMessage(Connection, "WHOIS " + target + " " + masklist, SendMessageType.Whois);
+            return new SendMessage(Connection, "WHOIS " + target + " " + masklist, SendType.Whois);
         }
 
         public SendMessage Whowas(String nickname)
         {
-            return new SendMessage(Connection, "WHOWAS " + nickname, SendMessageType.Whowas);
+            return new SendMessage(Connection, "WHOWAS " + nickname, SendType.Whowas);
         }
 
         public SendMessage Whowas(String[] nicknames)
         {
             String nicknamelist = String.Join(",", nicknames);
-            return new SendMessage(Connection, "WHOWAS " + nicknamelist, SendMessageType.Whowas);
+            return new SendMessage(Connection, "WHOWAS " + nicknamelist, SendType.Whowas);
         }
 
         public SendMessage Whowas(String nickname, String count)
         {
-            return new SendMessage(Connection, "WHOWAS " + nickname + " " + count + " ", SendMessageType.Whowas);
+            return new SendMessage(Connection, "WHOWAS " + nickname + " " + count + " ", SendType.Whowas);
         }
 
         public SendMessage Whowas(String[] nicknames, String count)
         {
             String nicknamelist = String.Join(",", nicknames);
-            return new SendMessage(Connection, "WHOWAS " + nicknamelist + " " + count + " ", SendMessageType.Whowas);
+            return new SendMessage(Connection, "WHOWAS " + nicknamelist + " " + count + " ", SendType.Whowas);
         }
 
         public SendMessage Whowas(String nickname, String count, String target)
         {
             return new SendMessage(Connection, "WHOWAS " + nickname + " " + count + " " + target, 
-                SendMessageType.Whowas);
+                SendType.Whowas);
         }
 
         public SendMessage Whowas(String[] nicknames, String count, String target)
         {
             String nicknamelist = String.Join(",", nicknames);
             return new SendMessage(Connection, "WHOWAS " + nicknamelist + " " + count + " " + target, 
-                SendMessageType.Whowas);
+                SendType.Whowas);
         }
 
         public SendMessage Kill(String nickname, String comment)
         {
-            return new SendMessage(Connection, "KILL " + nickname + " :" + comment, SendMessageType.Kill);
+            return new SendMessage(Connection, "KILL " + nickname + " :" + comment, SendType.Kill);
         }
 
         public SendMessage Ping(String server)
         {
-            return new SendMessage(Connection, "PING " + server, SendMessageType.Ping);
+            return new SendMessage(Connection, "PING " + server, SendType.Ping);
         }
 
         public SendMessage Ping(String server, String server2)
         {
-            return new SendMessage(Connection, "PING " + server + " " + server2, SendMessageType.Ping);
+            return new SendMessage(Connection, "PING " + server + " " + server2, SendType.Ping);
         }
 
         public SendMessage Pong(String server)
         {
-            return new SendMessage(Connection, "PONG " + server, SendMessageType.Pong);
+            return new SendMessage(Connection, "PONG " + server, SendType.Pong);
         }
 
         public SendMessage Pong(String server, String server2)
         {
-            return new SendMessage(Connection, "PONG " + server + " " + server2, SendMessageType.Pong);
+            return new SendMessage(Connection, "PONG " + server + " " + server2, SendType.Pong);
         }
 
         public SendMessage Error(String errormessage)
         {
-            return new SendMessage(Connection, "ERROR :" + errormessage, SendMessageType.Error);
+            return new SendMessage(Connection, "ERROR :" + errormessage, SendType.Error);
         }
 
         public SendMessage Away()
         {
-            return new SendMessage(Connection, "AWAY", SendMessageType.Away);
+            return new SendMessage(Connection, "AWAY", SendType.Away);
         }
 
         public SendMessage Away(String awaytext)
         {
-            return new SendMessage(Connection, "AWAY :" + awaytext, SendMessageType.Away);
+            return new SendMessage(Connection, "AWAY :" + awaytext, SendType.Away);
         }
 
         public SendMessage Rehash()
         {
-            return new SendMessage(Connection, "REHASH", SendMessageType.Rehash);
+            return new SendMessage(Connection, "REHASH", SendType.Rehash);
         }
 
         public SendMessage Die()
         {
-            return new SendMessage(Connection, "DIE", SendMessageType.Die);
+            return new SendMessage(Connection, "DIE", SendType.Die);
         }
 
         public SendMessage Restart()
         {
-            return new SendMessage(Connection, "RESTART", SendMessageType.Restart);
+            return new SendMessage(Connection, "RESTART", SendType.Restart);
         }
 
         public SendMessage Summon(String user)
         {
-            return new SendMessage(Connection, "SUMMON " + user, SendMessageType.Summon);
+            return new SendMessage(Connection, "SUMMON " + user, SendType.Summon);
         }
 
         public SendMessage Summon(String user, String target)
         {
-            return new SendMessage(Connection, "SUMMON " + user + " " + target, SendMessageType.Summon);
+            return new SendMessage(Connection, "SUMMON " + user + " " + target, SendType.Summon);
         }
 
         public SendMessage Summon(String user, String target, String channel)
         {
             return new SendMessage(Connection, "SUMMON " + user + " " + target + " " + channel, 
-                SendMessageType.Summon);
+                SendType.Summon);
         }
 
         public SendMessage Users()
         {
-            return new SendMessage(Connection, "USERS", SendMessageType.Users);
+            return new SendMessage(Connection, "USERS", SendType.Users);
         }
 
         public SendMessage Users(String target)
         {
-            return new SendMessage(Connection, "USERS " + target, SendMessageType.Users);
+            return new SendMessage(Connection, "USERS " + target, SendType.Users);
         }
 
         public SendMessage Wallops(String wallopstext)
         {
-            return new SendMessage(Connection, "WALLOPS :" + wallopstext, SendMessageType.Wallops);
+            return new SendMessage(Connection, "WALLOPS :" + wallopstext, SendType.Wallops);
         }
 
         public SendMessage Userhost(String nickname)
         {
-            return new SendMessage(Connection, "USERHOST " + nickname, SendMessageType.Userhost);
+            return new SendMessage(Connection, "USERHOST " + nickname, SendType.Userhost);
         }
 
         public SendMessage Userhost(String[] nicknames)
         {
             String nicknamelist = String.Join(" ", nicknames);
-            return new SendMessage(Connection, "USERHOST " + nicknamelist, SendMessageType.Userhost);
+            return new SendMessage(Connection, "USERHOST " + nicknamelist, SendType.Userhost);
         }
 
         public SendMessage Ison(String nickname)
         {
-            return new SendMessage(Connection, "ISON " + nickname, SendMessageType.Ison);
+            return new SendMessage(Connection, "ISON " + nickname, SendType.Ison);
         }
 
         public SendMessage Ison(String[] nicknames)
         {
             String nicknamelist = String.Join(" ", nicknames);
-            return new SendMessage(Connection, "ISON " + nicknamelist, SendMessageType.Ison);
+            return new SendMessage(Connection, "ISON " + nicknamelist, SendType.Ison);
         }
 
         public SendMessage Quit()
         {
-            return new SendMessage(Connection, "QUIT", SendMessageType.Quit);
+            return new SendMessage(Connection, "QUIT", SendType.Quit);
         }
 
         public SendMessage Quit(String quitmessage)
         {
-            return new SendMessage(Connection, "QUIT :" + quitmessage, SendMessageType.Quit);
+            return new SendMessage(Connection, "QUIT :" + quitmessage, SendType.Quit);
         }
 
         public SendMessage Squit(String server, String comment)
         {
-            return new SendMessage(Connection, "SQUIT " + server + " :" + comment, SendMessageType.Squit);
+            return new SendMessage(Connection, "SQUIT " + server + " :" + comment, SendType.Squit);
         }
     }
 }

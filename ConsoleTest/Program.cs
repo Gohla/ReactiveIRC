@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 using ReactiveIRC.Client;
+using Gohla.Shared;
+using ReactiveIRC.Interface;
 
 namespace ReactiveIRC.ConsoleTest
 {
@@ -9,7 +11,7 @@ namespace ReactiveIRC.ConsoleTest
         public static void Main(String[] args)
         {
             IRCClientConnection connection = new IRCClientConnection(args[0], Convert.ToUInt16(args[1]));
-            connection.RawMessages.Subscribe(s => Console.WriteLine(s));
+            connection.ReceivedMessages.Subscribe(PrintMessage);
             connection.Connect().Subscribe(
                 _ => Console.WriteLine("Connected!"),
                 e => Console.WriteLine(e.Message),
@@ -20,6 +22,12 @@ namespace ReactiveIRC.ConsoleTest
             {
                 Thread.Sleep(100);
             }
+        }
+
+        private static void PrintMessage(IReceiveMessage message)
+        {
+            Console.WriteLine(message.Sender.ToString() + " :: " + message.Receivers.ToString(", ") + " :: " + 
+                message.Contents);
         }
     }
 }
