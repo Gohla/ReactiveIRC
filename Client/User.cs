@@ -11,6 +11,7 @@ namespace ReactiveIRC.Client
     {
         private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
         private BehaviorSubject<bool> _away = new BehaviorSubject<bool>(false);
+        private BehaviorSubject<String> _name;
 
         public IObservable<IMessage> Messages { get; private set; }
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
@@ -21,16 +22,15 @@ namespace ReactiveIRC.Client
         public IObservable<bool> Away { get { return _away; } }
 
         public IClientConnection Connection { get; private set; }
-        public IIdentity Identity { get; private set; }
         public MessageTargetType Type { get { return MessageTargetType.User; } }
+        public IObservable<String> Name { get { return _name; } }
 
-        public IIdentity Key { get { return Identity; } }
-        String IKeyedObject<String>.Key { get { return Identity.Name; } }
+        public String Key { get { return Name.First(); } }
 
-        public User(IClientConnection connection, IIdentity identity)
+        public User(IClientConnection connection, String name)
         {
             Connection = connection;
-            Identity = identity;
+            _name = new BehaviorSubject<String>(name);
 
             Messages = connection.Messages
                 .Where(m => m.Receivers.Contains(this))
@@ -49,7 +49,7 @@ namespace ReactiveIRC.Client
                 return 1;
 
             int result = 0;
-            result = this.Identity.CompareTo(other.Identity);
+            result = this.Name.First().CompareTo(other.Name.First());
             return result;
         }
 
@@ -67,7 +67,7 @@ namespace ReactiveIRC.Client
                 return false;
 
             return
-                EqualityComparer<IIdentity>.Default.Equals(this.Identity, other.Identity)
+                EqualityComparer<String>.Default.Equals(this.Name.First(), other.Name.First())
              && EqualityComparer<IClientConnection>.Default.Equals(this.Connection, other.Connection)
              ;
         }
@@ -77,7 +77,7 @@ namespace ReactiveIRC.Client
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + EqualityComparer<IIdentity>.Default.GetHashCode(this.Identity);
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name.First());
                 hash = hash * 23 + EqualityComparer<IClientConnection>.Default.GetHashCode(this.Connection);
                 return hash;
             }
@@ -85,7 +85,7 @@ namespace ReactiveIRC.Client
 
         public override string ToString()
         {
-            return this.Identity.Name;
+            return this.Name.First();
         }
     }
 }

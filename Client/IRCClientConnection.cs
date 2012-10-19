@@ -19,7 +19,6 @@ namespace ReactiveIRC.Client
         private KeyedCollection<String, IUser> _users = new KeyedCollection<String, IUser>();
         private KeyedCollection<String, IChannel> _knownChannels = new KeyedCollection<String, IChannel>();
         private KeyedCollection<String, IUser> _knownUsers = new KeyedCollection<String, IUser>();
-        private KeyedCollection<IIdentity, IUser> _knownUsersByIdentity = new KeyedCollection<IIdentity, IUser>();
         private Subject<IMessage> _messages = new Subject<IMessage>();
         private Subject<IReceiveMessage> _receivedMessages = new Subject<IReceiveMessage>();
         private Subject<ISendMessage> _sentMessages = new Subject<ISendMessage>();
@@ -73,7 +72,7 @@ namespace ReactiveIRC.Client
             (
                 _messageSender.Nick(nickname)
               , _messageSender.User(username, 0, realname)
-            );
+            ).Finally(() => HandleLoginSent(nickname));
         }
 
         public IObservable<Unit> Login(String nickname, String username, String realname, String password)
@@ -83,12 +82,12 @@ namespace ReactiveIRC.Client
                 _messageSender.Pass(password)
               , _messageSender.Nick(nickname)
               , _messageSender.User(username, 0, realname)
-            );
+            ).Finally(() => HandleLoginSent(nickname));
         }
 
         public INetwork GetNetwork(String network)
         {
-            return new Network(this, new Identity(null, null, network));
+            return new Network(this, network);
         }
 
         public IChannel GetChannel(String name)
@@ -96,7 +95,7 @@ namespace ReactiveIRC.Client
             if(_knownChannels.Contains(name))
                 return _knownChannels[name];
 
-            Channel channel = new Channel(this, new Identity(name, null, null));
+            Channel channel = new Channel(this, name);
             _knownChannels.Add(channel);
             return channel;
         }
@@ -106,19 +105,15 @@ namespace ReactiveIRC.Client
             if(_knownUsers.Contains(nickname))
                 return _knownUsers[nickname];
 
-            User user = new User(this, new Identity(nickname, null, null));
+            User user = new User(this, nickname);
             _knownUsers.Add(user);
             return user;
         }
 
-        public IUser GetUser(IIdentity identity)
+        private void HandleLoginSent(String nickname)
         {
-            if(_knownUsersByIdentity.Contains(identity))
-                return _knownUsersByIdentity[identity];
-
-            User user = new User(this, identity);
-            _knownUsersByIdentity.Add(user);
-            return user;
+            _me = GetUser(nickname);
+            _users.Add(_me);
         }
 
         public int CompareTo(IClientConnection other)

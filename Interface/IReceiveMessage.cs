@@ -21,5 +21,10 @@ namespace ReactiveIRC.Interface
         /// Gets the type of the message.
         /// </summary>
         ReceiveType Type { get; }
+
+        /// <summary>
+        /// Gets the reply type of the message, if applicable.
+        /// </summary>
+        ReplyType ReplyType { get; }
     }
 }

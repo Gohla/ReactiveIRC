@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Gohla.Shared;
 using ReactiveIRC.Interface;
 
 namespace ReactiveIRC.Client
@@ -15,11 +15,10 @@ namespace ReactiveIRC.Client
         public IObservable<UserMode> UserModes { get { return _userModes; } }
 
         public IClientConnection Connection { get; private set; }
-        public IIdentity Identity { get { return User.Identity; } }
         public MessageTargetType Type { get { return MessageTargetType.ChannelUser; } }
+        public IObservable<String> Name { get { return User.Name; } }
 
-        public IIdentity Key { get { return Identity; } }
-        String IKeyedObject<String>.Key { get { return Identity.Name; } }
+        public String Key { get { return Name.First(); } }
 
         public ChannelUser(IClientConnection connection, IChannel channel, IUser user)
         {
@@ -117,7 +116,7 @@ namespace ReactiveIRC.Client
 
         public override string ToString()
         {
-            return this.Identity.Name;
+            return this.Name.First();
         }
     }
 }

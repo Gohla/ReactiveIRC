@@ -64,11 +64,11 @@ namespace ReactiveIRC.Protocol
             IMessageTarget sender = ParseSender(prefix);
 
             // Parse message type
-            ReceiveType type = ParseMessageType(command);
+            Tuple<ReceiveType, ReplyType> type = ParseMessageType(command);
 
             // Parse message
-            if(type != ReceiveType.Unknown)
-                return ParseInformationMessage(sender, type, parameters);
+            if(type.Item1 != ReceiveType.Unknown)
+                return ParseInformationMessage(sender, type.Item1, type.Item2, parameters);
             else
                 return ParseMessage(sender, line.Substring(prefix.Length + 1));
         }
@@ -89,14 +89,13 @@ namespace ReactiveIRC.Protocol
             if(results.Groups[3].Success)
                 host = results.Groups[3].Value;
 
-            Identity identity = new Identity(name, ident, host);
-            if(identity.HasName)
-                return Connection.GetUser(identity);
+            if(name != null)
+                return Connection.GetUser(name);
             else
-                return Connection.GetNetwork(identity.Host);
+                return Connection.GetNetwork(host);
         }
 
-        private ReceiveType ParseMessageType(String command)
+        private Tuple<ReceiveType, ReplyType> ParseMessageType(String command)
         {
             // Try to match a numeric code.
             Match results = CommandRegex.Match(command);
@@ -114,65 +113,65 @@ namespace ReactiveIRC.Protocol
                         case ReplyType.Created:
                         case ReplyType.MyInfo:
                         case ReplyType.Bounce:
-                            return ReceiveType.Login;
+                            return Tuple.Create(ReceiveType.Login, reply);
                         case ReplyType.LuserClient:
                         case ReplyType.LuserOp:
                         case ReplyType.LuserUnknown:
                         case ReplyType.LuserMe:
                         case ReplyType.LuserChannels:
-                            return ReceiveType.Info;
+                            return Tuple.Create(ReceiveType.Info, reply);
                         case ReplyType.MotdStart:
                         case ReplyType.Motd:
                         case ReplyType.EndOfMotd:
-                            return ReceiveType.Motd;
+                            return Tuple.Create(ReceiveType.Motd, reply);
                         case ReplyType.NamesReply:
                         case ReplyType.EndOfNames:
-                            return ReceiveType.Name;
+                            return Tuple.Create(ReceiveType.Name, reply);
                         case ReplyType.WhoReply:
                         case ReplyType.EndOfWho:
-                            return ReceiveType.Who;
+                            return Tuple.Create(ReceiveType.Who, reply);
                         case ReplyType.ListStart:
                         case ReplyType.List:
                         case ReplyType.ListEnd:
-                            return ReceiveType.List;
+                            return Tuple.Create(ReceiveType.List, reply);
                         case ReplyType.BanList:
                         case ReplyType.EndOfBanList:
-                            return ReceiveType.BanList;
+                            return Tuple.Create(ReceiveType.BanList, reply);
                         case ReplyType.TopicSetBy:
                         case ReplyType.Topic:
                         case ReplyType.NoTopic:
-                            return ReceiveType.Topic;
+                            return Tuple.Create(ReceiveType.Topic, reply);
                         case ReplyType.WhoIsUser:
                         case ReplyType.WhoIsServer:
                         case ReplyType.WhoIsOperator:
                         case ReplyType.WhoIsIdle:
                         case ReplyType.WhoIsChannels:
                         case ReplyType.EndOfWhoIs:
-                            return ReceiveType.WhoIs;
+                            return Tuple.Create(ReceiveType.WhoIs, reply);
                         case ReplyType.WhoWasUser:
                         case ReplyType.EndOfWhoWas:
-                            return ReceiveType.WhoWas;
+                            return Tuple.Create(ReceiveType.WhoWas, reply);
                         case ReplyType.UserModeIs:
-                            return ReceiveType.UserMode;
+                            return Tuple.Create(ReceiveType.UserMode, reply);
                         case ReplyType.CreatedAt:
                         case ReplyType.ChannelModeIs:
-                            return ReceiveType.ChannelMode;
+                            return Tuple.Create(ReceiveType.ChannelMode, reply);
                         default:
                             if((intCode >= 400) && (intCode <= 599))
-                                return ReceiveType.Error;
+                                return Tuple.Create(ReceiveType.Error, reply);
                             else
-                                return ReceiveType.Unknown;
+                                return Tuple.Create(ReceiveType.Unknown, reply);
                     }
                 }
             }
 
             // Not a numeric code.
-            return ReceiveType.Unknown;
+            return Tuple.Create(ReceiveType.Unknown, ReplyType.Unknown);
         }
 
-        private ReceiveMessage ParseInformationMessage(IMessageTarget sender, ReceiveType type, String parameters)
+        private ReceiveMessage ParseInformationMessage(IMessageTarget sender, ReceiveType type, ReplyType replyType, String parameters)
         {
-            return new ReceiveMessage(Connection, parameters, sender, type, Connection.Me);
+            return new ReceiveMessage(Connection, parameters, sender, type, replyType, Connection.Me);
         }
 
         private ReceiveMessage ParseMessage(IMessageTarget sender, String line)
@@ -210,7 +209,7 @@ namespace ReactiveIRC.Protocol
             message = ParseUndirectedMessage(QuitRegex, ReceiveType.Quit, sender, line);
             if(message != null) return message;
 
-            return new ReceiveMessage(Connection, line, sender, ReceiveType.Unknown);
+            return new ReceiveMessage(Connection, line, sender, ReceiveType.Unknown, ReplyType.Unknown);
         }
 
         private ReceiveMessage ParseUndirectedMessage(Regex regex, ReceiveType type, IMessageTarget sender, String line)
@@ -222,7 +221,8 @@ namespace ReactiveIRC.Protocol
                 if(results.Groups[1].Success)
                     message = results.Groups[1].Value;
 
-                return new ReceiveMessage(Connection, message, sender, ReceiveType.Ping, Connection.Me);
+                return new ReceiveMessage(Connection, message, sender, ReceiveType.Ping, ReplyType.Unknown, 
+                    Connection.Me);
             }
             return null;
         }
@@ -238,7 +238,7 @@ namespace ReactiveIRC.Protocol
                 if(results.Groups[2].Success)
                     message = results.Groups[2].Value;
 
-                return new ReceiveMessage(Connection, message, sender, type, receiver);
+                return new ReceiveMessage(Connection, message, sender, type, ReplyType.Unknown, receiver);
             }
             return null;
         }
@@ -256,7 +256,7 @@ namespace ReactiveIRC.Protocol
 
                 ReceiveType type = receiver.Type == MessageTargetType.Channel ? ReceiveType.ChannelModeChange : 
                     ReceiveType.UserModeChange;
-                return new ReceiveMessage(Connection, message, sender, type, receiver);
+                return new ReceiveMessage(Connection, message, sender, type, ReplyType.Unknown, receiver);
             }
             return null;
         }
@@ -270,7 +270,7 @@ namespace ReactiveIRC.Protocol
                 String channelName = results.Groups[2].Value;
                 IChannel channel = Connection.GetChannel(channelName);
 
-                return new ReceiveMessage(Connection, userName, sender, ReceiveType.Invite, channel);
+                return new ReceiveMessage(Connection, userName, sender, ReceiveType.Invite, ReplyType.Unknown, channel);
             }
             return null;
         }

@@ -1,4 +1,5 @@
-﻿using Gohla.Shared;
+﻿using System;
+using Gohla.Shared;
 
 namespace ReactiveIRC.Interface
 {
@@ -17,7 +18,7 @@ namespace ReactiveIRC.Interface
     /// <summary>
     /// Interface representing a message target (sender or receiver)
     /// </summary>
-    public interface IMessageTarget : IKeyedObject<IIdentity>
+    public interface IMessageTarget
     {
         /// <summary>
         /// Gets the connection this target belongs to.
@@ -25,13 +26,13 @@ namespace ReactiveIRC.Interface
         IClientConnection Connection { get; }
 
         /// <summary>
-        /// Gets the identity.
-        /// </summary>
-        IIdentity Identity { get; }
-
-        /// <summary>
         /// Gets the type.
         /// </summary>
         MessageTargetType Type { get; }
+
+        /// <summary>
+        /// Gets an observable stream of names. Sends current name on subscribe.
+        /// </summary>
+        IObservable<String> Name { get; }
     }
 }

@@ -127,12 +127,5 @@ namespace ReactiveIRC.Interface
         ///
         /// <param name="nickname">The nickname of the user.</param>
         IUser GetUser(String nickname);
-
-        /// <summary>
-        /// Gets the user with given identity.  If user was not known before, it is added to the known users.
-        /// </summary>
-        ///
-        /// <param name="identity">The identity of the user.</param>
-        IUser GetUser(IIdentity identity);
     }
 }

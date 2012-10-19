@@ -20,16 +20,15 @@ namespace ReactiveIRC.Client
         public IObservable<String> Topic { get { return _topic; } }
 
         public IClientConnection Connection { get; private set; }
-        public IIdentity Identity { get; private set; }
         public MessageTargetType Type { get { return MessageTargetType.Channel; } }
+        public IObservable<String> Name { get; private set; }
 
-        public IIdentity Key { get { return Identity; } }
-        String IKeyedObject<String>.Key { get { return Identity.Name; } }
+        public String Key { get { return Name.First(); } }
 
-        public Channel(IClientConnection connection, IIdentity identity)
+        public Channel(IClientConnection connection, String name)
         {
             Connection = connection;
-            Identity = identity;
+            Name = Observable.Return(name);
 
             Messages = connection.Messages
                 .Where(m => m.Receivers.Contains(this))
@@ -48,7 +47,7 @@ namespace ReactiveIRC.Client
                 return 1;
 
             int result = 0;
-            result = this.Identity.Name.CompareTo(other.Identity.Name);
+            result = this.Name.First().CompareTo(other.Name.First());
             if(result == 0)
                 result = this.Connection.CompareTo(other.Connection);
             return result;
@@ -68,7 +67,7 @@ namespace ReactiveIRC.Client
                 return false;
 
             return
-                EqualityComparer<String>.Default.Equals(this.Identity.Name, other.Identity.Name)
+                EqualityComparer<String>.Default.Equals(this.Name.First(), other.Name.First())
              && EqualityComparer<IClientConnection>.Default.Equals(this.Connection, other.Connection)
              ;
         }
@@ -78,7 +77,7 @@ namespace ReactiveIRC.Client
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Identity.Name);
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name.First());
                 hash = hash * 23 + EqualityComparer<IClientConnection>.Default.GetHashCode(this.Connection);
                 return hash;
             }
@@ -86,7 +85,7 @@ namespace ReactiveIRC.Client
 
         public override string ToString()
         {
-            return this.Identity.Name;
+            return this.Name.First();
         }
     }
 }
