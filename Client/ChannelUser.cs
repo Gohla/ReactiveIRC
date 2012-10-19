@@ -18,7 +18,7 @@ namespace ReactiveIRC.Client
         public MessageTargetType Type { get { return MessageTargetType.ChannelUser; } }
         public IObservable<String> Name { get { return User.Name; } }
 
-        public String Key { get { return Name.First(); } }
+        public String Key { get { return Name.FirstAsync().Wait(); } }
 
         public ChannelUser(IClientConnection connection, IChannel channel, IUser user)
         {
@@ -116,7 +116,7 @@ namespace ReactiveIRC.Client
 
         public override string ToString()
         {
-            return this.Name.First();
+            return this.Name.FirstAsync().Wait();
         }
     }
 }

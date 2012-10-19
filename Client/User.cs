@@ -25,7 +25,7 @@ namespace ReactiveIRC.Client
         public MessageTargetType Type { get { return MessageTargetType.User; } }
         public IObservable<String> Name { get { return _name; } }
 
-        public String Key { get { return Name.First(); } }
+        public String Key { get { return Name.FirstAsync().Wait(); } }
 
         public User(IClientConnection connection, String name)
         {
@@ -49,7 +49,7 @@ namespace ReactiveIRC.Client
                 return 1;
 
             int result = 0;
-            result = this.Name.First().CompareTo(other.Name.First());
+            result = this.Name.FirstAsync().Wait().CompareTo(other.Name.FirstAsync().Wait());
             return result;
         }
 
@@ -67,7 +67,7 @@ namespace ReactiveIRC.Client
                 return false;
 
             return
-                EqualityComparer<String>.Default.Equals(this.Name.First(), other.Name.First())
+                EqualityComparer<String>.Default.Equals(this.Name.FirstAsync().Wait(), other.Name.FirstAsync().Wait())
              && EqualityComparer<IClientConnection>.Default.Equals(this.Connection, other.Connection)
              ;
         }
@@ -77,7 +77,7 @@ namespace ReactiveIRC.Client
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name.First());
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name.FirstAsync().Wait());
                 hash = hash * 23 + EqualityComparer<IClientConnection>.Default.GetHashCode(this.Connection);
                 return hash;
             }
@@ -85,7 +85,7 @@ namespace ReactiveIRC.Client
 
         public override string ToString()
         {
-            return this.Name.First();
+            return this.Name.FirstAsync().Wait();
         }
     }
 }
