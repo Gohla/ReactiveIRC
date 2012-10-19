@@ -35,7 +35,7 @@ namespace ReactiveIRC.Client
         public IRCClientConnection(String address, ushort port)
             : base(address, port)
         {
-            _me = new User(this, _initialNickname);
+            _me = GetUser(_initialNickname) as User;
 
             _messageSender = new MessageSender(this);
             _messageReceiver = new MessageReceiver(this);
@@ -48,13 +48,61 @@ namespace ReactiveIRC.Client
             _sentMessages.Subscribe(_messages);
 
             _receivedMessages
-                .Where(m => m.ReplyType == ReplyType.Welcome)
-                .Subscribe(HandleWelcome)
+                .Where(m => m.Type == ReceiveType.Ping)
+                .Subscribe(HandlePing)
                 ;
-
             _receivedMessages
                 .Where(m => m.Type == ReceiveType.Join)
                 .Subscribe(HandleJoin)
+                ;
+            _receivedMessages
+                .Where(m => m.Type == ReceiveType.Part)
+                .Subscribe(HandlePart)
+                ;
+            _receivedMessages
+                .Where(m => m.Type == ReceiveType.Kick)
+                .Subscribe(HandleKick)
+                ;
+            _receivedMessages
+                .Where(m => m.Type == ReceiveType.Quit)
+                .Subscribe(HandleQuit)
+                ;
+            _receivedMessages
+                .Where(m => m.Type == ReceiveType.TopicChange)
+                .Subscribe(HandleTopicChange)
+                ;
+            _receivedMessages
+                .Where(m => m.Type == ReceiveType.ChannelModeChange)
+                .Subscribe(HandleChannelModeChange)
+                ;
+            _receivedMessages
+                .Where(m => m.Type == ReceiveType.UserModeChange)
+                .Subscribe(HandleUserModeChange)
+                ;
+
+            _receivedMessages
+                .Where(m => m.ReplyType == ReplyType.Welcome)
+                .Subscribe(HandleWelcome)
+                ;
+            _receivedMessages
+                .Where(m => m.ReplyType == ReplyType.ChannelModeIs)
+                .Subscribe(HandleChannelModeIs)
+                ;
+            _receivedMessages
+                .Where(m => m.ReplyType == ReplyType.Topic)
+                .Subscribe(HandleTopic)
+                ;
+            _receivedMessages
+                .Where(m => m.ReplyType == ReplyType.NamesReply)
+                .Subscribe(HandleNamesReply)
+                ;
+            _receivedMessages
+                .Where(m => m.ReplyType == ReplyType.Away)
+                .Subscribe(HandleAway)
+                ;
+            _receivedMessages
+                .Where(m => m.ReplyType == ReplyType.UnAway)
+                .Subscribe(HandleUnAway)
                 ;
         }
 
@@ -135,31 +183,114 @@ namespace ReactiveIRC.Client
             user.AddChannel(channel);
         }
 
+        private void RemoveUserFromChannel(String nickname, String channelName)
+        {
+            User user = GetChannel(nickname) as User;
+            Channel channel = GetUser(channelName) as Channel;
+            RemoveUserFromChannel(user, channel);
+        }
+
+        private void RemoveUserFromChannel(User user, Channel channel)
+        {
+            channel.RemoveUser(user.Name);
+            user.RemoveChannel(channel.Name);
+        }
+
         private void ChangeNickname(User user, String nickname)
         {
-            //_users.ChangeItemKey(user, nickname);
-            //user.Channels.Cast<Channel>().Do(c => c.ChangeNickname(user.Name))
-            //foreach(Channel channel in user.Channels)
+            _users.ChangeItemKey(user, nickname);
+            user.Channels.Cast<Channel>().Do(c => c.ChangeNickname(user.Name, nickname));
+            user.SetNickname(nickname);
+        }
+
+        private void HandlePing(IReceiveMessage message)
+        {
+            String server = message.Sender.Name;
+            Send(_messageSender.Pong(server)).Subscribe();
+        }
+
+        private void HandleJoin(IReceiveMessage message)
+        {
+            if(message.Receivers.Count != 1)
+            {
+                _logger.Error("Join message with no or more than one receiver.");
+                return;
+            }
+
+            User user = message.Sender as User;
+            Channel channel = message.Receivers.First() as Channel;
+            AddUserToChannel(user, channel);
+        }
+
+        private void HandlePart(IReceiveMessage message)
+        {
+            if(message.Receivers.Count != 1)
+            {
+                _logger.Error("Part message with no or more than one receiver.");
+                return;
+            }
+
+            User user = message.Sender as User;
+            Channel channel = message.Receivers.First() as Channel;
+            RemoveUserFromChannel(user, channel);
+        }
+
+        private void HandleKick(IReceiveMessage message)
+        {
+            HandlePart(message);
+        }
+
+        private void HandleQuit(IReceiveMessage message)
+        {
+            User user = message.Sender as User;
+            user.Channels.Cast<Channel>().Do(c => RemoveUserFromChannel(user, c));
+            _users.Remove(user);
+        }
+
+        private void HandleTopicChange(IReceiveMessage message)
+        {
+
+        }
+
+        private void HandleChannelModeChange(IReceiveMessage message)
+        {
+
+        }
+
+        private void HandleUserModeChange(IReceiveMessage message)
+        {
+
         }
 
         private void HandleWelcome(IReceiveMessage message)
         {
             String nickname = message.Contents.Split(new[] { ' ' }, 2)[0];
             ChangeNickname(_me, nickname);
-            //_me = GetUser(nickname) as User;
         }
 
-        private void HandleJoin(IReceiveMessage message)
+        private void HandleChannelModeIs(IReceiveMessage message)
         {
-            if(message.Receivers.Count != 1)
-                _logger.Error("Join message with no or more than one receiver.");
 
-            Channel channel = message.Receivers.First() as Channel;
+        }
 
-            if(message.Sender.Equals(_me))
-            {
-                AddUserToChannel(_me, channel);
-            }
+        private void HandleTopic(IReceiveMessage message)
+        {
+
+        }
+
+        private void HandleNamesReply(IReceiveMessage message)
+        {
+
+        }
+
+        private void HandleAway(IReceiveMessage message)
+        {
+
+        }
+
+        private void HandleUnAway(IReceiveMessage message)
+        {
+
         }
 
         public int CompareTo(IClientConnection other)

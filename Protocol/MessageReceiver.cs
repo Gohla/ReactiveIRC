@@ -25,13 +25,13 @@ namespace ReactiveIRC.Protocol
             RegexOptions.Compiled);
         private static readonly Regex NoticeRegex = new Regex("^NOTICE ([^:]*?) :(.*)$", RegexOptions.Compiled);
         private static readonly Regex InviteRegex = new Regex("^INVITE (.*) (.*)$", RegexOptions.Compiled);
-        private static readonly Regex JoinRegex = new Regex("^JOIN :(.*)$", RegexOptions.Compiled);
+        private static readonly Regex JoinRegex = new Regex("^JOIN :?(.*)$", RegexOptions.Compiled);
         private static readonly Regex TopicRegex = new Regex("^TOPIC ([^:]*?) :(.*)$", RegexOptions.Compiled);
-        private static readonly Regex NickRegex = new Regex("^NICK (.*)$", RegexOptions.Compiled);
-        private static readonly Regex KickRegex = new Regex("^KICK (.*) (.*)$", RegexOptions.Compiled);
-        private static readonly Regex PartRegex = new Regex("^PART (.*)$", RegexOptions.Compiled);
-        private static readonly Regex ModeRegex = new Regex("^MODE (.*) (.*)$", RegexOptions.Compiled);
-        private static readonly Regex QuitRegex = new Regex("^QUIT :(.*)$", RegexOptions.Compiled);
+        private static readonly Regex NickRegex = new Regex("^NICK :?(.*)$", RegexOptions.Compiled);
+        private static readonly Regex KickRegex = new Regex("^KICK (.*) :?(.*)$", RegexOptions.Compiled);
+        private static readonly Regex PartRegex = new Regex("^PART :?(.*)$", RegexOptions.Compiled);
+        private static readonly Regex ModeRegex = new Regex("^MODE (.*) :?(.*)$", RegexOptions.Compiled);
+        private static readonly Regex QuitRegex = new Regex("^QUIT :?(.*)$", RegexOptions.Compiled);
 
         public IClientConnection Connection { get; private set; }
 
@@ -58,7 +58,9 @@ namespace ReactiveIRC.Protocol
             String[] tokens = line.Split(new []{' '}, 3);
             String prefix = tokens[0];
             String command = tokens[1];
-            String parameters = tokens[2];
+            String parameters = String.Empty;
+            if(tokens.Length == 3)
+                parameters = tokens[2];
 
             // Parse sender
             IMessageTarget sender = ParseSender(prefix);

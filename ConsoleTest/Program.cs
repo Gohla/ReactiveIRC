@@ -3,6 +3,7 @@ using System.Threading;
 using NLog;
 using ReactiveIRC.Client;
 using ReactiveIRC.Interface;
+using Gohla.Shared;
 
 namespace ReactiveIRC.ConsoleTest
 {
