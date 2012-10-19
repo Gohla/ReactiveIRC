@@ -138,6 +138,7 @@ namespace ReactiveIRC.Protocol
                         case ReplyType.BanList:
                         case ReplyType.EndOfBanList:
                             return ReceiveType.BanList;
+                        case ReplyType.TopicSetBy:
                         case ReplyType.Topic:
                         case ReplyType.NoTopic:
                             return ReceiveType.Topic;
@@ -153,6 +154,7 @@ namespace ReactiveIRC.Protocol
                             return ReceiveType.WhoWas;
                         case ReplyType.UserModeIs:
                             return ReceiveType.UserMode;
+                        case ReplyType.CreatedAt:
                         case ReplyType.ChannelModeIs:
                             return ReceiveType.ChannelMode;
                         default:
@@ -200,8 +202,8 @@ namespace ReactiveIRC.Protocol
             if(message != null) return message;
             message = ParseDirectedMessage(TopicRegex, ReceiveType.TopicChange, sender, line);
             if(message != null) return message;
-            //message = ParseDirectedMessage(ModeRegex, ReceiveType.Mode, sender, line, offset);
-            //if(message != null) return message;
+            message = ParseModeMessage(sender, line);
+            if(message != null) return message;
 
             message = ParseUndirectedMessage(NickRegex, ReceiveType.NickChange, sender, line);
             if(message != null) return message;
@@ -231,20 +233,7 @@ namespace ReactiveIRC.Protocol
             if(results.Success && results.Groups[1].Success)
             {
                 String receiverName = results.Groups[1].Value;
-                IMessageTarget receiver;
-                switch(receiverName[0])
-                {
-                    case '#':
-                    case '!':
-                    case '&':
-                    case '+':
-                        receiver = Connection.GetChannel(receiverName);
-                        break;
-                    default:
-                        receiver = Connection.GetUser(receiverName);
-                        break;
-                }
-
+                IMessageTarget receiver = ParseReceiver(receiverName);
                 String message = String.Empty;
                 if(results.Groups[2].Success)
                     message = results.Groups[2].Value;
@@ -252,6 +241,56 @@ namespace ReactiveIRC.Protocol
                 return new ReceiveMessage(Connection, message, sender, type, receiver);
             }
             return null;
+        }
+
+        private ReceiveMessage ParseModeMessage(IMessageTarget sender, String line)
+        {
+            Match results = ModeRegex.Match(line);
+            if(results.Success && results.Groups[1].Success)
+            {
+                String receiverName = results.Groups[1].Value;
+                IMessageTarget receiver = ParseReceiver(receiverName);
+                String message = String.Empty;
+                if(results.Groups[2].Success)
+                    message = results.Groups[2].Value;
+
+                ReceiveType type = receiver.Type == MessageTargetType.Channel ? ReceiveType.ChannelModeChange : 
+                    ReceiveType.UserModeChange;
+                return new ReceiveMessage(Connection, message, sender, type, receiver);
+            }
+            return null;
+        }
+
+        private ReceiveMessage ParseInviteMessage(IMessageTarget sender, String line)
+        {
+            Match results = InviteRegex.Match(line);
+            if(results.Success && results.Groups[1].Success && results.Groups[2].Success)
+            {
+                String userName = results.Groups[1].Value;
+                String channelName = results.Groups[2].Value;
+                IChannel channel = Connection.GetChannel(channelName);
+
+                return new ReceiveMessage(Connection, userName, sender, ReceiveType.Invite, channel);
+            }
+            return null;
+        }
+
+        private IMessageTarget ParseReceiver(String name)
+        {
+            IMessageTarget receiver = null;
+            switch(name[0])
+            {
+                case '#':
+                case '!':
+                case '&':
+                case '+':
+                    receiver = Connection.GetChannel(name);
+                    break;
+                default:
+                    receiver = Connection.GetUser(name);
+                    break;
+            }
+            return receiver;
         }
     }
 }

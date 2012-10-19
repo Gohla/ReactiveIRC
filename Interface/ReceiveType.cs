@@ -29,6 +29,7 @@
       , Message	            // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
       , Action              // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
       , Notice              // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
+      , Invite              // {IChannelUser, IUser, INetwork}  -> {IChannel}.
       , Join                // {IChannelUser}                   -> {IChannel}. 
       , Part                // {IChannelUser}                   -> {IChannel}. 
       , Kick                // {IChannelUser, INetwork}         -> {IChannelUser}. 

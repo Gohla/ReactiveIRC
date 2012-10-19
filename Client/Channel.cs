@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Gohla.Shared;
 using ReactiveIRC.Interface;
@@ -30,7 +31,15 @@ namespace ReactiveIRC.Client
             Connection = connection;
             Identity = identity;
 
-            // TODO: set messages
+            Messages = connection.Messages
+                .Where(m => m.Receivers.Contains(this))
+                ;
+            ReceivedMessages = connection.ReceivedMessages
+                .Where(m => m.Receivers.Contains(this))
+                ;
+            SentMessages = connection.SentMessages
+                .Where(m => m.Receivers.Contains(this))
+                ;
         }
 
         public int CompareTo(IChannel other)
