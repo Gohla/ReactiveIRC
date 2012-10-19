@@ -29,9 +29,8 @@ namespace ReactiveIRC.Interface
         IObservableCollection<IChannel> Channels { get; }
 
         /// <summary>
-        /// Gets an observable stream of values indicating whether the user is marked as away. Sends current value on
-        /// subscribe.
+        /// Gets a value indicating whether the user is marked as away. Subscribe to receive changes.
         /// </summary>
-        IObservable<bool> Away { get; }
+        ObservableProperty<bool> Away { get; }
     }
 }

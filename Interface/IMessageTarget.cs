@@ -31,8 +31,8 @@ namespace ReactiveIRC.Interface
         MessageTargetType Type { get; }
 
         /// <summary>
-        /// Gets an observable stream of names. Sends current name on subscribe.
+        /// Gets the name of the target. Subscribe to receive changes.
         /// </summary>
-        IObservable<String> Name { get; }
+        ObservableProperty<String> Name { get; }
     }
 }

@@ -25,7 +25,7 @@ namespace ReactiveIRC.Protocol
             RegexOptions.Compiled);
         private static readonly Regex NoticeRegex = new Regex("^NOTICE ([^:]*?) :(.*)$", RegexOptions.Compiled);
         private static readonly Regex InviteRegex = new Regex("^INVITE (.*) (.*)$", RegexOptions.Compiled);
-        private static readonly Regex JoinRegex = new Regex("^JOIN (.*)$", RegexOptions.Compiled);
+        private static readonly Regex JoinRegex = new Regex("^JOIN :(.*)$", RegexOptions.Compiled);
         private static readonly Regex TopicRegex = new Regex("^TOPIC ([^:]*?) :(.*)$", RegexOptions.Compiled);
         private static readonly Regex NickRegex = new Regex("^NICK (.*)$", RegexOptions.Compiled);
         private static readonly Regex KickRegex = new Regex("^KICK (.*) (.*)$", RegexOptions.Compiled);

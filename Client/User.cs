@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using Gohla.Shared;
 using ReactiveIRC.Interface;
 
@@ -10,8 +9,8 @@ namespace ReactiveIRC.Client
     public class User : IUser
     {
         private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
-        private BehaviorSubject<bool> _away = new BehaviorSubject<bool>(false);
-        private BehaviorSubject<String> _name;
+        private ObservableProperty<bool> _away = new ObservableProperty<bool>(false);
+        private ObservableProperty<String> _name;
 
         public IObservable<IMessage> Messages { get; private set; }
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
@@ -19,18 +18,18 @@ namespace ReactiveIRC.Client
 
         public IObservableCollection<IChannel> Channels { get { return _channels; } }
 
-        public IObservable<bool> Away { get { return _away; } }
+        public ObservableProperty<bool> Away { get { return _away; } }
 
         public IClientConnection Connection { get; private set; }
         public MessageTargetType Type { get { return MessageTargetType.User; } }
-        public IObservable<String> Name { get { return _name; } }
+        public ObservableProperty<String> Name { get { return _name; } }
 
-        public String Key { get { return Name.FirstAsync().Wait(); } }
+        public String Key { get { return Name; } }
 
         public User(IClientConnection connection, String name)
         {
             Connection = connection;
-            _name = new BehaviorSubject<String>(name);
+            _name = new ObservableProperty<String>(name);
 
             Messages = connection.Messages
                 .Where(m => m.Receivers.Contains(this))
@@ -43,13 +42,28 @@ namespace ReactiveIRC.Client
                 ;
         }
 
+        internal void AddChannel(IChannel channel)
+        {
+            _channels.Add(channel);
+        }
+
+        internal void RemoveChannel(String channel)
+        {
+            _channels.Remove(channel);
+        }
+
+        internal void SetNickname(String nickname)
+        {
+            _name.Value = nickname;
+        }
+
         public int CompareTo(IUser other)
         {
             if(ReferenceEquals(other, null))
                 return 1;
 
             int result = 0;
-            result = this.Name.FirstAsync().Wait().CompareTo(other.Name.FirstAsync().Wait());
+            result = this.Name.Value.CompareTo(other.Name);
             return result;
         }
 
@@ -67,7 +81,7 @@ namespace ReactiveIRC.Client
                 return false;
 
             return
-                EqualityComparer<String>.Default.Equals(this.Name.FirstAsync().Wait(), other.Name.FirstAsync().Wait())
+                EqualityComparer<String>.Default.Equals(this.Name, other.Name)
              && EqualityComparer<IClientConnection>.Default.Equals(this.Connection, other.Connection)
              ;
         }
@@ -77,7 +91,7 @@ namespace ReactiveIRC.Client
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name.FirstAsync().Wait());
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name);
                 hash = hash * 23 + EqualityComparer<IClientConnection>.Default.GetHashCode(this.Connection);
                 return hash;
             }
@@ -85,7 +99,7 @@ namespace ReactiveIRC.Client
 
         public override string ToString()
         {
-            return this.Name.FirstAsync().Wait();
+            return this.Name;
         }
     }
 }

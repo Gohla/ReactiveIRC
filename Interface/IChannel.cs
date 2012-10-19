@@ -29,8 +29,8 @@ namespace ReactiveIRC.Interface
         IObservableCollection<IChannelUser> Users { get; }
 
         /// <summary>
-        /// Gets an observable stream of topics. Sends current value on subscribe.
+        /// Gets the topic of the channel. Subscribe to receive changes.
         /// </summary>
-        IObservable<String> Topic { get; }
+        ObservableProperty<String> Topic { get; }
     }
 }

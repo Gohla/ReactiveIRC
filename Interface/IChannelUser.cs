@@ -13,7 +13,9 @@ namespace ReactiveIRC.Interface
         Voice = 1,
         HalfOp = 2,
         Op = 4,
-        ServerOp = 8
+        Protected = 8,
+        Owner = 16,
+        ServerOp = 32
     }
 
     /// <summary>
@@ -33,8 +35,8 @@ namespace ReactiveIRC.Interface
         IUser User { get; }
 
         /// <summary>
-        /// Gets a the user modes that the user has on the channel.
+        /// Gets a the user modes that the user has on the channel. Subscribe to receive changes.
         /// </summary>
-        IObservable<UserMode> UserModes { get; }
+        ObservableProperty<UserMode> UserModes { get; }
     }
 }

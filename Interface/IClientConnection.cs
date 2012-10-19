@@ -25,24 +25,14 @@ namespace ReactiveIRC.Interface
         IUser Me { get; }
 
         /// <summary>
-        /// Gets the channels the current user has joined.
+        /// Gets the known channels. Can contain invalid channels.
         /// </summary>
         IObservableCollection<IChannel> Channels { get; }
 
         /// <summary>
-        /// Gets the users that are visible through channels.
-        /// </summary>
-        IObservableCollection<IUser> Users { get; }
-
-        /// <summary>
-        /// Gets the known channels. Can contain invalid channels.
-        /// </summary>
-        IObservableCollection<IChannel> KnownChannels { get; }
-
-        /// <summary>
         /// Gets the known users. Can contain invalid users.
         /// </summary>
-        IObservableCollection<IUser> KnownUsers { get; }
+        IObservableCollection<IUser> Users { get; }
 
         /// <summary>
         /// Gets an observable stream of all received and sent messages.

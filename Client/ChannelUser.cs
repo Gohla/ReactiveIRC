@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
+using Gohla.Shared;
 using ReactiveIRC.Interface;
 
 namespace ReactiveIRC.Client
 {
     public class ChannelUser : IChannelUser
     {
-        private BehaviorSubject<UserMode> _userModes = new BehaviorSubject<UserMode>(UserMode.None);
+        private ObservableProperty<UserMode> _userModes = new ObservableProperty<UserMode>(UserMode.None);
 
         public IChannel Channel { get; private set; }
         public IUser User { get; private set; }
-        public IObservable<UserMode> UserModes { get { return _userModes; } }
+        public ObservableProperty<UserMode> UserModes { get { return _userModes; } }
 
         public IClientConnection Connection { get; private set; }
         public MessageTargetType Type { get { return MessageTargetType.ChannelUser; } }
-        public IObservable<String> Name { get { return User.Name; } }
+        public ObservableProperty<String> Name { get { return User.Name; } }
 
-        public String Key { get { return Name.FirstAsync().Wait(); } }
+        public String Key { get { return Name; } }
 
         public ChannelUser(IClientConnection connection, IChannel channel, IUser user)
         {
@@ -116,7 +115,7 @@ namespace ReactiveIRC.Client
 
         public override string ToString()
         {
-            return this.Name.FirstAsync().Wait();
+            return this.Name;
         }
     }
 }

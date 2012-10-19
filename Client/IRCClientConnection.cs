@@ -7,18 +7,20 @@ using System.Reactive.Subjects;
 using Gohla.Shared;
 using ReactiveIRC.Interface;
 using ReactiveIRC.Protocol;
+using NLog;
 
 namespace ReactiveIRC.Client
 {
     public class IRCClientConnection : RawClientConnection, IClientConnection
     {
+        protected static readonly Logger _logger = NLog.LogManager.GetLogger("IRCClientConnection");
+        protected static readonly String _initialNickname = "***initial***";
+
         private MessageSender _messageSender;
         private MessageReceiver _messageReceiver;
-        private IUser _me;
+        private User _me;
         private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
         private KeyedCollection<String, IUser> _users = new KeyedCollection<String, IUser>();
-        private KeyedCollection<String, IChannel> _knownChannels = new KeyedCollection<String, IChannel>();
-        private KeyedCollection<String, IUser> _knownUsers = new KeyedCollection<String, IUser>();
         private Subject<IMessage> _messages = new Subject<IMessage>();
         private Subject<IReceiveMessage> _receivedMessages = new Subject<IReceiveMessage>();
         private Subject<ISendMessage> _sentMessages = new Subject<ISendMessage>();
@@ -26,8 +28,6 @@ namespace ReactiveIRC.Client
         public IUser Me { get { return _me; } }
         public IObservableCollection<IChannel> Channels { get { return _channels; } }
         public IObservableCollection<IUser> Users { get { return _users; } }
-        public IObservableCollection<IChannel> KnownChannels { get { return _knownChannels; } }
-        public IObservableCollection<IUser> KnownUsers { get { return _knownUsers; } }
         public IObservable<IMessage> Messages { get { return _messages; } }
         public IObservable<IReceiveMessage> ReceivedMessages { get { return _receivedMessages; } }
         public IObservable<ISendMessage> SentMessages { get { return _sentMessages; } }
@@ -35,6 +35,8 @@ namespace ReactiveIRC.Client
         public IRCClientConnection(String address, ushort port)
             : base(address, port)
         {
+            _me = new User(this, _initialNickname);
+
             _messageSender = new MessageSender(this);
             _messageReceiver = new MessageReceiver(this);
 
@@ -44,6 +46,16 @@ namespace ReactiveIRC.Client
                 ;
             _receivedMessages.Subscribe(_messages);
             _sentMessages.Subscribe(_messages);
+
+            _receivedMessages
+                .Where(m => m.ReplyType == ReplyType.Welcome)
+                .Subscribe(HandleWelcome)
+                ;
+
+            _receivedMessages
+                .Where(m => m.Type == ReceiveType.Join)
+                .Subscribe(HandleJoin)
+                ;
         }
 
         public IObservable<Unit> Send(params ISendMessage[] messages)
@@ -72,7 +84,7 @@ namespace ReactiveIRC.Client
             (
                 _messageSender.Nick(nickname)
               , _messageSender.User(username, 0, realname)
-            ).Finally(() => HandleLoginSent(nickname));
+            );
         }
 
         public IObservable<Unit> Login(String nickname, String username, String realname, String password)
@@ -82,38 +94,72 @@ namespace ReactiveIRC.Client
                 _messageSender.Pass(password)
               , _messageSender.Nick(nickname)
               , _messageSender.User(username, 0, realname)
-            ).Finally(() => HandleLoginSent(nickname));
+            );
         }
 
-        public INetwork GetNetwork(String network)
+        public INetwork GetNetwork(String networkName)
         {
-            return new Network(this, network);
+            return new Network(this, networkName);
         }
 
-        public IChannel GetChannel(String name)
+        public IChannel GetChannel(String channelName)
         {
-            if(_knownChannels.Contains(name))
-                return _knownChannels[name];
+            if(_channels.Contains(channelName))
+                return _channels[channelName];
 
-            Channel channel = new Channel(this, name);
-            _knownChannels.Add(channel);
+            Channel channel = new Channel(this, channelName);
+            _channels.Add(channel);
             return channel;
         }
 
         public IUser GetUser(String nickname)
         {
-            if(_knownUsers.Contains(nickname))
-                return _knownUsers[nickname];
+            if(_users.Contains(nickname))
+                return _users[nickname];
 
             User user = new User(this, nickname);
-            _knownUsers.Add(user);
+            _users.Add(user);
             return user;
         }
 
-        private void HandleLoginSent(String nickname)
+        private void AddUserToChannel(String nickname, String channelName)
         {
-            _me = GetUser(nickname);
-            _users.Add(_me);
+            User user = GetChannel(nickname) as User;
+            Channel channel = GetUser(channelName) as Channel;
+            AddUserToChannel(user, channel);
+        }
+
+        private void AddUserToChannel(User user, Channel channel)
+        {
+            channel.AddUser(user);
+            user.AddChannel(channel);
+        }
+
+        private void ChangeNickname(User user, String nickname)
+        {
+            //_users.ChangeItemKey(user, nickname);
+            //user.Channels.Cast<Channel>().Do(c => c.ChangeNickname(user.Name))
+            //foreach(Channel channel in user.Channels)
+        }
+
+        private void HandleWelcome(IReceiveMessage message)
+        {
+            String nickname = message.Contents.Split(new[] { ' ' }, 2)[0];
+            ChangeNickname(_me, nickname);
+            //_me = GetUser(nickname) as User;
+        }
+
+        private void HandleJoin(IReceiveMessage message)
+        {
+            if(message.Receivers.Count != 1)
+                _logger.Error("Join message with no or more than one receiver.");
+
+            Channel channel = message.Receivers.First() as Channel;
+
+            if(message.Sender.Equals(_me))
+            {
+                AddUserToChannel(_me, channel);
+            }
         }
 
         public int CompareTo(IClientConnection other)
