@@ -1,13 +1,19 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using ReactiveIRC.Interface;
-using System.Linq;
 
 namespace ReactiveIRC.Protocol
 {
+    // http://tools.ietf.org/html/rfc2812
     public class MessageSender
     {
-        public IConnection Connection { get; private set; }
+        public IClientConnection Connection { get; private set; }
+
+        public MessageSender(IClientConnection connection)
+        {
+            Connection = connection;
+        }
 
         public SendMessage Pass(String password)
         {
@@ -286,26 +292,27 @@ namespace ReactiveIRC.Protocol
             return new SendMessage(Connection, "LIST", SendMessageType.List);
         }
 
-        public SendMessage List(String channel)
+        public SendMessage List(IChannel channel)
         {
-            return new SendMessage(Connection, "LIST " + channel, SendMessageType.List);
+            return new SendMessage(Connection, "LIST " + channel.Identity.Name, SendMessageType.List, channel);
         }
 
-        public SendMessage List(String[] channels)
+        public SendMessage List(IChannel[] channels)
         {
-            String channellist = String.Join(",", channels);
-            return new SendMessage(Connection, "LIST " + channellist, SendMessageType.List);
+            String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
+            return new SendMessage(Connection, "LIST " + channellist, SendMessageType.List, channels);
         }
 
-        public SendMessage List(String channel, String target)
+        public SendMessage List(IChannel channel, String target)
         {
-            return new SendMessage(Connection, "LIST " + channel + " " + target, SendMessageType.List);
+            return new SendMessage(Connection, "LIST " + channel.Identity.Name + " " + target, SendMessageType.List, 
+                channel);
         }
 
-        public SendMessage List(String[] channels, String target)
+        public SendMessage List(IChannel[] channels, String target)
         {
-            String channellist = String.Join(",", channels);
-            return new SendMessage(Connection, "LIST " + channellist + " " + target, SendMessageType.List);
+            String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
+            return new SendMessage(Connection, "LIST " + channellist + " " + target, SendMessageType.List, channels);
         }
 
         public SendMessage Names()
@@ -313,36 +320,38 @@ namespace ReactiveIRC.Protocol
             return new SendMessage(Connection, "NAMES", SendMessageType.Names);
         }
 
-        public SendMessage Names(String channel)
+        public SendMessage Names(IChannel channel)
         {
-            return new SendMessage(Connection, "NAMES " + channel, SendMessageType.Names);
+            return new SendMessage(Connection, "NAMES " + channel.Identity.Name, SendMessageType.Names, channel);
         }
 
-        public SendMessage Names(String[] channels)
+        public SendMessage Names(IChannel[] channels)
         {
-            String channellist = String.Join(",", channels);
-            return new SendMessage(Connection, "NAMES " + channellist, SendMessageType.Names);
+            String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
+            return new SendMessage(Connection, "NAMES " + channellist, SendMessageType.Names, channels);
         }
 
-        public SendMessage Names(String channel, String target)
+        public SendMessage Names(IChannel channel, String target)
         {
-            return new SendMessage(Connection, "NAMES " + channel + " " + target, SendMessageType.Names);
+            return new SendMessage(Connection, "NAMES " + channel.Identity.Name + " " + target, SendMessageType.Names, 
+                channel);
         }
 
-        public SendMessage Names(String[] channels, String target)
+        public SendMessage Names(IChannel[] channels, String target)
         {
-            String channellist = String.Join(",", channels);
-            return new SendMessage(Connection, "NAMES " + channellist + " " + target, SendMessageType.Names);
+            String channellist = String.Join(",", channels.Select(c => c.Identity.Name));
+            return new SendMessage(Connection, "NAMES " + channellist + " " + target, SendMessageType.Names, channels);
         }
 
-        public SendMessage Topic(String channel)
+        public SendMessage Topic(IChannel channel)
         {
-            return new SendMessage(Connection, "TOPIC " + channel, SendMessageType.Topic);
+            return new SendMessage(Connection, "TOPIC " + channel.Identity.Name, SendMessageType.Topic, channel);
         }
 
-        public SendMessage Topic(String channel, String newtopic)
+        public SendMessage Topic(IChannel channel, String newtopic)
         {
-            return new SendMessage(Connection, "TOPIC " + channel + " :" + newtopic, SendMessageType.Topic);
+            return new SendMessage(Connection, "TOPIC " + channel.Identity.Name + " :" + newtopic, 
+                SendMessageType.Topic, channel);
         }
 
         public SendMessage Mode(String target)
@@ -421,9 +430,10 @@ namespace ReactiveIRC.Protocol
                 SendMessageType.Service);
         }
 
-        public SendMessage Invite(String nickname, String channel)
+        public SendMessage Invite(IUser user, IChannel channel)
         {
-            return new SendMessage(Connection, "INVITE " + nickname + " " + channel, SendMessageType.Invite);
+            return new SendMessage(Connection, "INVITE " + user.Identity.Name + " " + channel.Identity.Name, 
+                SendMessageType.Invite, user);
         }
 
         public SendMessage Who()

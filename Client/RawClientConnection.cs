@@ -6,9 +6,9 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 
-namespace ReactiveIRC.Connection
+namespace ReactiveIRC.Client
 {
-    public class RawConnection : IDisposable
+    public class RawClientConnection : IDisposable
     {
         private TcpClient _socket = new TcpClient();
         private Subject<String> _rawMessages = new Subject<String>();
@@ -18,7 +18,7 @@ namespace ReactiveIRC.Connection
         public ushort Port { get; private set; }
         public IObservable<String> RawMessages { get { return _rawMessages; } }
 
-        public RawConnection(String address, ushort port)
+        public RawClientConnection(String address, ushort port)
         {
             if(String.IsNullOrEmpty(address))
                 throw new ArgumentNullException("address");
@@ -66,6 +66,7 @@ namespace ReactiveIRC.Connection
 
         public IObservable<Unit> WriteRaw(params String[] messages)
         {
+            // TODO: Send all at once.
             return Observable.Merge(messages.Select(m => WriteRaw(m)));
         }
 

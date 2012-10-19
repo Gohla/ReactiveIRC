@@ -20,7 +20,7 @@
         /// <summary>
         /// Gets the connection this target belongs to.
         /// </summary>
-        IConnection Connection { get; }
+        IClientConnection Connection { get; }
 
         /// <summary>
         /// Gets the identity.

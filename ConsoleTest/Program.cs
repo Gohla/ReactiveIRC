@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using ReactiveIRC.Connection;
+using ReactiveIRC.Client;
 
 namespace ReactiveIRC.ConsoleTest
 {
@@ -8,7 +8,7 @@ namespace ReactiveIRC.ConsoleTest
     {
         public static void Main(String[] args)
         {
-            IRCConnection connection = new IRCConnection(args[0], Convert.ToUInt16(args[1]));
+            IRCClientConnection connection = new IRCClientConnection(args[0], Convert.ToUInt16(args[1]));
             connection.RawMessages.Subscribe(s => Console.WriteLine(s));
             connection.Connect().Subscribe(
                 _ => Console.WriteLine("Connected!"),

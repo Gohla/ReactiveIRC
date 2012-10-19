@@ -7,7 +7,7 @@ namespace ReactiveIRC.Interface
     /// <summary>
     /// Interface representing a connection to an IRC server.
     /// </summary>
-    public interface IConnection : IEquatable<IConnection>, IComparable<IConnection>, IDisposable
+    public interface IClientConnection : IEquatable<IClientConnection>, IComparable<IClientConnection>, IDisposable
     {
         /// <summary>
         /// Gets the server address.
@@ -66,6 +66,36 @@ namespace ReactiveIRC.Interface
         /// An observable stream that notifies when disconnected or when failed to disconnect.
         /// </returns>
         IObservable<Unit> Disconnect();
+
+        /// <summary>
+        /// Send given messages to the server.
+        /// </summary>
+        ///
+        /// <param name="messages">An observable stream that notifies when message is sent or has failed to send.</param>
+        IObservable<Unit> Send(params ISendMessage[] messages);
+
+        /// <summary>
+        /// Logins in on the IRC server.
+        /// </summary>
+        ///
+        /// <param name="nickname">The nickname.</param>
+        /// <param name="username">The user name.</param>
+        /// <param name="realname">The real name.</param>
+        ///
+        /// <param name="messages">An observable stream that notifies when message is sent or has failed to send.</param>
+        IObservable<Unit> Login(String nickname, String username, String realname);
+
+        /// <summary>
+        /// Logins in on the password protected IRC server.
+        /// </summary>
+        ///
+        /// <param name="nickname">The nickname.</param>
+        /// <param name="username">The user name.</param>
+        /// <param name="realname">The real name.</param>
+        /// <param name="password">The password.</param>
+        ///
+        /// <param name="messages">An observable stream that notifies when message is sent or has failed to send.</param>
+        IObservable<Unit> Login(String nickname, String username, String realname, String password);
 
         /// <summary>
         /// Gets the network with given name. 

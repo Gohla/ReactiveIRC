@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveIRC.Connection", "Connection\ReactiveIRC.Connection.csproj", "{84AD60CA-B25F-4125-8730-A1C69C26808E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveIRC.Client", "Client\ReactiveIRC.Client.csproj", "{7922535F-8AEB-4B17-B558-801EE543805F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Libraries", "2. Libraries", "{2FBEB532-5E88-47F2-8C0F-4B8F8A4EEB42}"
@@ -29,10 +27,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{84AD60CA-B25F-4125-8730-A1C69C26808E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84AD60CA-B25F-4125-8730-A1C69C26808E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84AD60CA-B25F-4125-8730-A1C69C26808E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84AD60CA-B25F-4125-8730-A1C69C26808E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7922535F-8AEB-4B17-B558-801EE543805F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7922535F-8AEB-4B17-B558-801EE543805F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7922535F-8AEB-4B17-B558-801EE543805F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -54,7 +48,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{84AD60CA-B25F-4125-8730-A1C69C26808E} = {2FBEB532-5E88-47F2-8C0F-4B8F8A4EEB42}
 		{7922535F-8AEB-4B17-B558-801EE543805F} = {2FBEB532-5E88-47F2-8C0F-4B8F8A4EEB42}
 		{3A9061FB-E286-402E-B4EC-30C7BC8FEA64} = {2FBEB532-5E88-47F2-8C0F-4B8F8A4EEB42}
 		{C699BFFA-5FE2-441C-9679-59BEAD165BC6} = {2FBEB532-5E88-47F2-8C0F-4B8F8A4EEB42}

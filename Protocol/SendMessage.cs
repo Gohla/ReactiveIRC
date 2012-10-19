@@ -8,7 +8,8 @@ namespace ReactiveIRC.Protocol
         public String Raw { get; private set; }
         public SendMessageType Type { get; private set; }
 
-        public SendMessage(IConnection connection, String raw, SendMessageType type, params IMessageTarget[] receivers) :
+        public SendMessage(IClientConnection connection, String raw, SendMessageType type, 
+            params IMessageTarget[] receivers) :
             base(connection, receivers)
         {
             Raw = raw;

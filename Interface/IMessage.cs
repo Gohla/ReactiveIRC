@@ -11,7 +11,7 @@ namespace ReactiveIRC.Interface
         /// <summary>
         /// Gets the connection this message belongs to.
         /// </summary>
-        IConnection Connection { get; }
+        IClientConnection Connection { get; }
 
         /// <summary>
         /// Gets the receivers of the message. If empty, receiver is global.

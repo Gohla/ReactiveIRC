@@ -9,8 +9,8 @@ namespace ReactiveIRC.Protocol
         public IMessageTarget Sender { get; private set; }
         public ReceiveMessageType Type { get; private set; }
 
-        public ReceiveMessage(IConnection connection, String contents, IMessageTarget sender, ReceiveMessageType type, 
-            params IMessageTarget[] receivers) :
+        public ReceiveMessage(IClientConnection connection, String contents, IMessageTarget sender, 
+            ReceiveMessageType type, params IMessageTarget[] receivers) :
             base(connection, receivers)
         {
             Contents = contents;

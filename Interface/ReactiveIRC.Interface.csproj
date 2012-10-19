@@ -56,7 +56,7 @@
   <ItemGroup>
     <Compile Include="IChannel.cs" />
     <Compile Include="IChannelUser.cs" />
-    <Compile Include="IConnection.cs" />
+    <Compile Include="IClientConnection.cs" />
     <Compile Include="IIdentity.cs" />
     <Compile Include="IMessage.cs" />
     <Compile Include="IMessageTarget.cs" />
