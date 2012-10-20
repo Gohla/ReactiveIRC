@@ -180,9 +180,9 @@ namespace ReactiveIRC.Protocol
         {
             ReceiveMessage message = null;
 
-            message = ParseUndirectedMessage(PingRegex, ReceiveType.Ping, Connection.Network, line);
+            message = ParseUndirectedMessage(PingRegex, ReceiveType.Ping, Connection.Network, line, Connection.Me);
             if(message != null) return message;
-            message = ParseUndirectedMessage(ErrorRegex, ReceiveType.Error, Connection.Network, line);
+            message = ParseUndirectedMessage(ErrorRegex, ReceiveType.Error, Connection.Network, line, Connection.Me);
             if(message != null) return message;
 
             return message;
@@ -204,9 +204,6 @@ namespace ReactiveIRC.Protocol
             message = ParseDirectedMessage(ActionRegex, ReceiveType.Notice, sender, line);
             if(message != null) return message;
 
-            message = ParseInviteMessage(sender, line);
-            if(message != null) return message;
-
             message = ParseDirectedMessage(JoinRegex, ReceiveType.Join, sender, line);
             if(message != null) return message;
             message = ParseDirectedMessage(PartRegex, ReceiveType.Part, sender, line);
@@ -215,18 +212,22 @@ namespace ReactiveIRC.Protocol
             if(message != null) return message;
             message = ParseDirectedMessage(TopicRegex, ReceiveType.TopicChange, sender, line);
             if(message != null) return message;
-            message = ParseModeMessage(sender, line);
+
+            message = ParseUndirectedMessage(NickRegex, ReceiveType.NickChange, sender, line, Connection.Network);
+            if(message != null) return message;
+            message = ParseUndirectedMessage(QuitRegex, ReceiveType.Quit, sender, line, Connection.Network);
             if(message != null) return message;
 
-            message = ParseUndirectedMessage(NickRegex, ReceiveType.NickChange, sender, line);
+            message = ParseModeMessage(sender, line);
             if(message != null) return message;
-            message = ParseUndirectedMessage(QuitRegex, ReceiveType.Quit, sender, line);
+            message = ParseInviteMessage(sender, line);
             if(message != null) return message;
 
             return new ReceiveMessage(Connection, line, sender, ReceiveType.Unknown, ReplyType.Unknown);
         }
 
-        private ReceiveMessage ParseUndirectedMessage(Regex regex, ReceiveType type, IMessageTarget sender, String line)
+        private ReceiveMessage ParseUndirectedMessage(Regex regex, ReceiveType type, IMessageTarget sender, String line,
+            IMessageTarget receiver)
         {
             Match results = regex.Match(line);
             if(results.Success)
@@ -235,8 +236,8 @@ namespace ReactiveIRC.Protocol
                 if(results.Groups[1].Success)
                     message = results.Groups[1].Value;
 
-                return new ReceiveMessage(Connection, message, sender, type, ReplyType.Unknown, 
-                    Connection.Me);
+                return new ReceiveMessage(Connection, message, sender, type, ReplyType.Unknown,
+                    receiver);
             }
             return null;
         }
