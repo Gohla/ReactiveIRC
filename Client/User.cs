@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using Gohla.Shared;
+using NLog;
 using ReactiveIRC.Interface;
 
 namespace ReactiveIRC.Client
 {
     public class User : IUser
     {
+        protected static readonly Logger _logger = NLog.LogManager.GetLogger("User");
+
         private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
         private ObservableProperty<bool> _away = new ObservableProperty<bool>(false);
         private ObservableProperty<String> _name;
@@ -45,12 +48,26 @@ namespace ReactiveIRC.Client
 
         internal void AddChannel(IChannel channel)
         {
+            if(_channels.Contains(channel.Name))
+            {
+                _logger.Error("Trying to add channel " + channel.Name + " to user " + Name +
+                    ", but user is already in this channel.");
+                return;
+            }
+
             _channels.Add(channel);
         }
 
-        internal void RemoveChannel(String channel)
+        internal bool RemoveChannel(String channel)
         {
-            _channels.Remove(channel);
+            if(!_channels.Contains(channel))
+            {
+                _logger.Error("Trying to remove channel " + channel + " from user " + Name +
+                    ", but user is not in this channel.");
+                return false;
+            }
+
+            return _channels.Remove(channel);
         }
 
         public int CompareTo(IUser other)

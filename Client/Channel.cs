@@ -57,7 +57,11 @@ namespace ReactiveIRC.Client
         internal IChannelUser AddUser(IUser user)
         {
             if(_users.Contains(user.Name))
+            {
+                _logger.Error("Trying to add user " + user.Name + " to channel " + Name + 
+                    ", but user is already in this channel.");
                 return _users[user.Name];
+            }
 
             ChannelUser channelUser = new ChannelUser(Connection, this, user);
             _users.Add(channelUser);
@@ -66,6 +70,13 @@ namespace ReactiveIRC.Client
 
         internal bool RemoveUser(String nickname)
         {
+            if(!_users.Contains(nickname))
+            {
+                _logger.Error("Trying to remove user " + nickname + " from channel " + Name +
+                    ", but user does not exist in this channel.");
+                return false;
+            }
+
             return _users.Remove(nickname);
         }
 

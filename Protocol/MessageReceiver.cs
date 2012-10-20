@@ -29,7 +29,7 @@ namespace ReactiveIRC.Protocol
         private static readonly Regex JoinRegex = new Regex("^JOIN :?([^: ]*)$", RegexOptions.Compiled);
         private static readonly Regex TopicRegex = new Regex("^TOPIC ([^: ]*?) :?(.*)$", RegexOptions.Compiled);
         private static readonly Regex NickRegex = new Regex("^NICK :?([^: ]*)$", RegexOptions.Compiled);
-        private static readonly Regex KickRegex = new Regex("^KICK ([^: ]*?) :?(.*)$", RegexOptions.Compiled);
+        private static readonly Regex KickRegex = new Regex("^KICK ([^: ]*?) ([^: ]*?)(?: :(.*))?$", RegexOptions.Compiled);
         private static readonly Regex PartRegex = new Regex("^PART ([^: ]*?)(?: :(.*))?$", RegexOptions.Compiled);
         private static readonly Regex ModeRegex = new Regex("^MODE ([^: ]*?) :?(.*)$", RegexOptions.Compiled);
         private static readonly Regex QuitRegex = new Regex("^QUIT :?(.*)$", RegexOptions.Compiled);
@@ -208,7 +208,7 @@ namespace ReactiveIRC.Protocol
             if(message != null) return message;
             message = ParseDirectedMessage(PartRegex, ReceiveType.Part, sender, line);
             if(message != null) return message;
-            message = ParseDirectedMessage(KickRegex, ReceiveType.Kick, sender, line);
+            message = ParseKickMessage(sender, line);
             if(message != null) return message;
             message = ParseDirectedMessage(TopicRegex, ReceiveType.TopicChange, sender, line);
             if(message != null) return message;
@@ -254,6 +254,25 @@ namespace ReactiveIRC.Protocol
                     message = results.Groups[2].Value;
 
                 return new ReceiveMessage(Connection, message, sender, type, ReplyType.Unknown, receiver);
+            }
+            return null;
+        }
+
+        private ReceiveMessage ParseKickMessage(IMessageTarget sender, String line)
+        {
+            Match results = KickRegex.Match(line);
+            if(results.Success && results.Groups[1].Success && results.Groups[2].Success)
+            {
+                String channelName = results.Groups[1].Value;
+                String userName = results.Groups[2].Value;
+                String message = String.Empty;
+                if(results.Groups[3].Success)
+                    message = results.Groups[3].Value;
+                IChannel channel = Connection.GetChannel(channelName);
+                IChannelUser channelUser = channel.GetUser(userName);
+
+                return new ReceiveMessage(Connection, message, sender, ReceiveType.Kick, ReplyType.Unknown, 
+                    channelUser);
             }
             return null;
         }

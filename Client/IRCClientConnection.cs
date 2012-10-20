@@ -198,6 +198,11 @@ namespace ReactiveIRC.Client
             user.RemoveChannel(channel.Name);
         }
 
+        private void RemoveUserFromChannel(ChannelUser channelUser)
+        {
+            RemoveUserFromChannel(channelUser.User as User, channelUser.Channel as Channel);
+        }
+
         private void ChangeNickname(User user, String nickname)
         {
             if(_users.Contains(nickname))
@@ -250,7 +255,14 @@ namespace ReactiveIRC.Client
 
         private void HandleKick(IReceiveMessage message)
         {
-            HandlePart(message);
+            if(message.Receivers.Count != 1)
+            {
+                _logger.Error("Kick message with no or more than one receiver.");
+                return;
+            }
+
+            ChannelUser channelUser = message.Receivers.First() as ChannelUser;
+            RemoveUserFromChannel(channelUser);
         }
 
         private void HandleQuit(IReceiveMessage message)
