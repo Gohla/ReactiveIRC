@@ -25,6 +25,15 @@ namespace ReactiveIRC.Client
             Modes = new Mode();
         }
 
+        public void Dispose()
+        {
+            if(Modes == null)
+                return;
+
+            Modes.Dispose();
+            Modes = null;
+        }
+
         public int CompareTo(IChannel other)
         {
             if(ReferenceEquals(other, null))

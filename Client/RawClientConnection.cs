@@ -55,7 +55,7 @@ namespace ReactiveIRC.Client
                 ;
         }
 
-        public IObservable<Unit> WriteRaw(String message)
+        protected IObservable<Unit> WriteRaw(String message)
         {
             byte[] data = Encoding.UTF8.GetBytes(message + Environment.NewLine);
             return _socket.Client
@@ -64,7 +64,7 @@ namespace ReactiveIRC.Client
                 ;
         }
 
-        public IObservable<Unit> WriteRaw(params String[] messages)
+        protected IObservable<Unit> WriteRaw(params String[] messages)
         {
             // TODO: Send all at once.
             return Observable.Merge(messages.Select(m => WriteRaw(m)));

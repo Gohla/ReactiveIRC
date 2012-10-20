@@ -19,6 +19,15 @@ namespace ReactiveIRC.Client
             Name = new ObservableProperty<String>(name);
         }
 
+        public void Dispose()
+        {
+            if(Name == null)
+                return;
+
+            Name.Dispose();
+            Name = null;
+        }
+
         public int CompareTo(INetwork other)
         {
             if(ReferenceEquals(other, null))

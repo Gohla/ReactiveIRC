@@ -10,7 +10,7 @@ namespace ReactiveIRC.Interface
         public char Mode { get; set; }
     }
 
-    public class Mode
+    public class Mode : IDisposable
     {
         public ObservableHashSet<char> Modes { get; private set; }
         public ObservableProperty<String> ModesString { get; private set; }
@@ -19,6 +19,18 @@ namespace ReactiveIRC.Interface
         {
             Modes = new ObservableHashSet<char>();
             ModesString = new ObservableProperty<String>(String.Empty);
+        }
+
+        public void Dispose()
+        {
+            if(Modes == null)
+                return;
+
+            Modes.Clear();
+            Modes.Dispose();
+            Modes = null;
+            ModesString.Dispose();
+            ModesString = null;
         }
 
         public void AddMode(char mode)

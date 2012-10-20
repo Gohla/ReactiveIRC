@@ -36,9 +36,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Gohla.Shared, Version=1.0.4675.40028, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Gohla.Shared, Version=1.0.4676.37502, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Gohla.Shared.1.0.4675.40028\lib\net45\Gohla.Shared.dll</HintPath>
+      <HintPath>..\packages\Gohla.Shared.1.0.4676.37502\lib\net45\Gohla.Shared.dll</HintPath>
     </Reference>
     <Reference Include="NLog">
       <HintPath>..\packages\NLog.2.0.0.2000\lib\net40\NLog.dll</HintPath>

@@ -7,7 +7,7 @@ namespace ReactiveIRC.Interface
     /// <summary>
     /// Interface representing a connection to an IRC server.
     /// </summary>
-    public interface IClientConnection : IEquatable<IClientConnection>, IComparable<IClientConnection>, IDisposable
+    public interface IClientConnection : IDisposable, IEquatable<IClientConnection>, IComparable<IClientConnection>
     {
         /// <summary>
         /// Gets the server address.
@@ -23,6 +23,11 @@ namespace ReactiveIRC.Interface
         /// Gets the current user.
         /// </summary>
         IUser Me { get; }
+
+        /// <summary>
+        /// Gets the known networks. Can contain invalid networks.
+        /// </summary>
+        IObservableCollection<INetwork> Networks { get; }
 
         /// <summary>
         /// Gets the known channels. Can contain invalid channels.

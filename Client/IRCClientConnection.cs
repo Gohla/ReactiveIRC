@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Gohla.Shared;
+using NLog;
 using ReactiveIRC.Interface;
 using ReactiveIRC.Protocol;
-using NLog;
 
 namespace ReactiveIRC.Client
 {
@@ -19,13 +20,16 @@ namespace ReactiveIRC.Client
         private MessageSender _messageSender;
         private MessageReceiver _messageReceiver;
         private User _me;
+        private KeyedCollection<String, INetwork> _networks = new KeyedCollection<String, INetwork>();
         private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
         private KeyedCollection<String, IUser> _users = new KeyedCollection<String, IUser>();
         private Subject<IMessage> _messages = new Subject<IMessage>();
         private Subject<IReceiveMessage> _receivedMessages = new Subject<IReceiveMessage>();
         private Subject<ISendMessage> _sentMessages = new Subject<ISendMessage>();
+        private CompositeDisposable _disposables = new CompositeDisposable();
 
         public IUser Me { get { return _me; } }
+        public IObservableCollection<INetwork> Networks { get { return _networks; } }
         public IObservableCollection<IChannel> Channels { get { return _channels; } }
         public IObservableCollection<IUser> Users { get { return _users; } }
         public IObservable<IMessage> Messages { get { return _messages; } }
@@ -40,82 +44,113 @@ namespace ReactiveIRC.Client
             _messageSender = new MessageSender(this);
             _messageReceiver = new MessageReceiver(this);
 
-            RawMessages
+            _disposables.Add(RawMessages
                 .Select(r => _messageReceiver.Receive(r))
                 .Subscribe(_receivedMessages)
-                ;
-            _receivedMessages.Subscribe(_messages);
-            _sentMessages.Subscribe(_messages);
+                );
+            _disposables.Add(_receivedMessages.Subscribe(_messages));
+            _disposables.Add(_sentMessages.Subscribe(_messages));
 
-            _receivedMessages
+            _disposables.Add(_receivedMessages
                 .Where(m => m.Type == ReceiveType.Ping)
                 .Subscribe(HandlePing)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.Type == ReceiveType.Join)
                 .Subscribe(HandleJoin)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.Type == ReceiveType.Part)
                 .Subscribe(HandlePart)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.Type == ReceiveType.Kick)
                 .Subscribe(HandleKick)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.Type == ReceiveType.Quit)
                 .Subscribe(HandleQuit)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.Type == ReceiveType.TopicChange)
                 .Subscribe(HandleTopicChange)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.Type == ReceiveType.ChannelModeChange)
                 .Subscribe(HandleChannelModeChange)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.Type == ReceiveType.UserModeChange)
                 .Subscribe(HandleUserModeChange)
-                ;
+                );
 
-            _receivedMessages
+            _disposables.Add(_receivedMessages
                 .Where(m => m.ReplyType == ReplyType.Welcome)
                 .Subscribe(HandleWelcome)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.ReplyType == ReplyType.ChannelModeIs)
                 .Subscribe(HandleChannelModeIsReply)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.ReplyType == ReplyType.CreatedAt)
                 .Subscribe(HandleCreatedAtReply)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.ReplyType == ReplyType.Topic)
                 .Subscribe(HandleTopicReply)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.ReplyType == ReplyType.TopicSetBy)
                 .Subscribe(HandleTopicSetByReply)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.ReplyType == ReplyType.NamesReply)
                 .Subscribe(HandleNamesReply)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.ReplyType == ReplyType.WhoReply)
                 .Subscribe(HandleWhoReply)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.ReplyType == ReplyType.Away)
                 .Subscribe(HandleAwayReply)
-                ;
-            _receivedMessages
+                );
+            _disposables.Add(_receivedMessages
                 .Where(m => m.ReplyType == ReplyType.UnAway)
                 .Subscribe(HandleUnAwayReply)
-                ;
+                );
+        }
+
+        new public void Dispose()
+        {
+            if(_disposables == null)
+                return;
+
+            _disposables.Dispose();
+            _disposables = null;
+
+            _sentMessages.OnCompleted();
+            _sentMessages.Dispose();
+            _sentMessages = null;
+            _receivedMessages.OnCompleted();
+            _receivedMessages.Dispose();
+            _receivedMessages = null;
+            _messages.OnCompleted();
+            _messages.Dispose();
+            _messages = null;
+
+            _users.Do(u => u.Dispose());
+            _users.Clear();
+            _users = null;
+            _channels.Do(c => c.Dispose());
+            _channels.Clear();
+            _channels = null;
+            _networks.Do(n => n.Dispose());
+            _networks.Clear();
+            _networks = null;
+
+            base.Dispose();
         }
 
         public IObservable<Unit> Send(params ISendMessage[] messages)
@@ -132,10 +167,10 @@ namespace ReactiveIRC.Client
         {
             messages.Do(m => _sentMessages.OnNext(m));
 
-            Observable.Merge(
+            _disposables.Add(Observable.Merge(
                 messages
                     .Select(m => WriteRaw(m.Raw))
-            ).Subscribe();
+            ).Subscribe());
         }
 
         public IObservable<Unit> Login(String nickname)
@@ -169,7 +204,12 @@ namespace ReactiveIRC.Client
 
         public INetwork GetNetwork(String networkName)
         {
-            return new Network(this, networkName);
+            if(_networks.Contains(networkName))
+                return _networks[networkName];
+
+            Network network = new Network(this, networkName);
+            _networks.Add(network);
+            return network;
         }
 
         public IChannel GetChannel(String channelName)

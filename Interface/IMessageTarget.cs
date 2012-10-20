@@ -18,7 +18,7 @@ namespace ReactiveIRC.Interface
     /// <summary>
     /// Interface representing a message target (sender or receiver)
     /// </summary>
-    public interface IMessageTarget
+    public interface IMessageTarget : IDisposable
     {
         /// <summary>
         /// Gets the connection this target belongs to.

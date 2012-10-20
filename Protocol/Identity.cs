@@ -22,6 +22,19 @@ namespace ReactiveIRC.Protocol
             Host = new ObservableProperty<String>(host);
         }
 
+        public void Dispose()
+        {
+            if(Host == null)
+                return;
+
+            Host.Dispose();
+            Host = null;
+            Ident.Dispose();
+            Ident = null;
+            Name.Dispose();
+            Name = null;
+        }
+
         public static IIdentity Parse(String str)
         {
             Match results = PrefixRegex.Match(str);

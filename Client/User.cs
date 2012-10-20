@@ -13,8 +13,6 @@ namespace ReactiveIRC.Client
         protected static readonly Logger _logger = NLog.LogManager.GetLogger("User");
 
         private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
-        private ObservableProperty<bool> _away = new ObservableProperty<bool>(false);
-        private ObservableProperty<String> _name;
 
         public IObservable<IMessage> Messages { get; private set; }
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
@@ -25,11 +23,11 @@ namespace ReactiveIRC.Client
         public ObservableProperty<String> RealName { get; private set; }
         public ObservableProperty<INetwork> Network { get; private set; }
         public Mode Modes { get; private set; }
-        public ObservableProperty<bool> Away { get { return _away; } }
+        public ObservableProperty<bool> Away { get; private set; }
 
         public IClientConnection Connection { get; private set; }
         public MessageTargetType Type { get { return MessageTargetType.User; } }
-        public ObservableProperty<String> Name { get { return _name; } }
+        public ObservableProperty<String> Name { get; private set; }
 
         public String Key { get { return Name; } }
 
@@ -40,7 +38,8 @@ namespace ReactiveIRC.Client
             RealName = new ObservableProperty<String>(String.Empty);
             Network = new ObservableProperty<INetwork>(null);
             Modes = new Mode();
-            _name = new ObservableProperty<String>(name);
+            Away = new ObservableProperty<bool>(false);
+            Name = new ObservableProperty<String>(name);
 
             Messages = connection.Messages
                 .Where(m => m.Receivers.Contains(this))
@@ -51,6 +50,28 @@ namespace ReactiveIRC.Client
             SentMessages = connection.SentMessages
                 .Where(m => m.Receivers.Contains(this))
                 ;
+        }
+
+        public void Dispose()
+        {
+            if(Name == null)
+                return;
+
+            Name.Dispose();
+            Name = null;
+            Away.Dispose();
+            Away = null;
+            Modes.Dispose();
+            Modes = null;
+            Network.Dispose();
+            Network = null;
+            RealName.Dispose();
+            RealName = null;
+            Identity.Dispose();
+            Identity = null;
+            _channels.Clear();
+            _channels.Dispose();
+            _channels = null;
         }
 
         internal void AddChannel(IChannel channel)

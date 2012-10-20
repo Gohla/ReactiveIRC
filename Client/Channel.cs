@@ -51,6 +51,29 @@ namespace ReactiveIRC.Client
                 ;
         }
 
+        public void Dispose()
+        {
+            if(Name == null)
+                return;
+
+            Name.Dispose();
+            Name = null;
+            Modes.Dispose();
+            Modes = null;
+            Topic.Dispose();
+            Topic = null;
+            TopicSetBy.Dispose();
+            TopicSetBy = null;
+            TopicSetDate.Dispose();
+            TopicSetDate = null;
+            CreatedDate.Dispose();
+            CreatedDate = null;
+            _users.Do(u => u.Dispose());
+            _users.Clear();
+            _users.Dispose();
+            _users = null;
+        }
+
         public IChannelUser GetUser(String nickname)
         {
             if(_users.Contains(nickname))

@@ -13,6 +13,7 @@ namespace ReactiveIRC.ConsoleTest
 
         public static void Main(String[] args)
         {
+            bool run = true;
             IRCClientConnection connection = new IRCClientConnection(args[0], Convert.ToUInt16(args[1]));
             connection.ReceivedMessages.Subscribe(PrintMessage);
             connection.Connect().Subscribe(
@@ -21,7 +22,13 @@ namespace ReactiveIRC.ConsoleTest
                 () => connection.Login(args[2], args[3], args[4], args[5]).Subscribe()
             );
 
-            while(true)
+            Console.CancelKeyPress += delegate
+            {
+                connection.Dispose();
+                run = false;
+            };
+
+            while(run)
             {
                 Thread.Sleep(50);
             }

@@ -6,8 +6,8 @@ namespace ReactiveIRC.Interface
     /// <summary>
     /// Interface representing a user on a certain channel.
     /// </summary>
-    public interface IChannelUser : IMessageTarget, IKeyedObject<String>, IComparable<IChannel>, IEquatable<IChannel>, IComparable<IUser>,
-        IEquatable<IUser>, IComparable<IChannelUser>, IEquatable<IChannelUser>
+    public interface IChannelUser : IMessageTarget, IDisposable, IKeyedObject<String>, IComparable<IChannel>, 
+        IEquatable<IChannel>, IComparable<IUser>, IEquatable<IUser>, IComparable<IChannelUser>, IEquatable<IChannelUser>
     {
         /// <summary>
         /// Gets the channel.

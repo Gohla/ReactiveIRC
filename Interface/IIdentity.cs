@@ -6,7 +6,7 @@ namespace ReactiveIRC.Interface
     /// <summary>
     /// Interface representing an identity on IRC.
     /// </summary>
-    public interface IIdentity : IEquatable<IIdentity>, IComparable<IIdentity>
+    public interface IIdentity : IDisposable, IEquatable<IIdentity>, IComparable<IIdentity>
     {
         /// <summary>
         /// Gets the name. Initially set to nickname of user. Subscribe to receive changes.
