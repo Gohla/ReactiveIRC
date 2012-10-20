@@ -19,6 +19,7 @@ namespace ReactiveIRC.Client
         private MessageSender _messageSender;
         private MessageReceiver _messageReceiver;
         private User _me;
+        private Network _network;
         private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
         private KeyedCollection<String, IUser> _users = new KeyedCollection<String, IUser>();
         private Subject<IMessage> _messages = new Subject<IMessage>();
@@ -26,6 +27,7 @@ namespace ReactiveIRC.Client
         private Subject<ISendMessage> _sentMessages = new Subject<ISendMessage>();
 
         public IUser Me { get { return _me; } }
+        public INetwork Network { get { return _network; } }
         public IObservableCollection<IChannel> Channels { get { return _channels; } }
         public IObservableCollection<IUser> Users { get { return _users; } }
         public IObservable<IMessage> Messages { get { return _messages; } }
@@ -205,8 +207,7 @@ namespace ReactiveIRC.Client
 
         private void HandlePing(IReceiveMessage message)
         {
-            String server = message.Sender.Name;
-            Send(_messageSender.Pong(server)).Subscribe();
+            Send(_messageSender.Pong(message.Contents)).Subscribe();
         }
 
         private void HandleJoin(IReceiveMessage message)
@@ -266,6 +267,7 @@ namespace ReactiveIRC.Client
         {
             String nickname = message.Contents.Split(new[] { ' ' }, 2)[0];
             ChangeNickname(_me, nickname);
+            _network = message.Sender as Network;
         }
 
         private void HandleChannelModeIs(IReceiveMessage message)

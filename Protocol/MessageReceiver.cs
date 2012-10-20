@@ -14,8 +14,9 @@ namespace ReactiveIRC.Protocol
             RegexOptions.Compiled);
         private static readonly Regex CommandRegex = new Regex("^([0-9]{3})$", RegexOptions.Compiled);
 
-        private static readonly Regex PingRegex = new Regex("^PING :(.*)", RegexOptions.Compiled);
-        private static readonly Regex ErrorRegex = new Regex("^ERROR :(.*)", RegexOptions.Compiled);
+        private static readonly Regex PingRegex = new Regex("^PING :?(.*)", RegexOptions.Compiled);
+        private static readonly Regex ErrorRegex = new Regex("^ERROR :?(.*)", RegexOptions.Compiled);
+
         private static readonly Regex ActionRegex = new Regex("^PRIVMSG ([^:]*?) :" + "\x1" + "ACTION (.*)" + "\x1" + "$", 
             RegexOptions.Compiled);
         private static readonly Regex CtcpRequestRegex = new Regex("^PRIVMSG ([^:]*?) :" + "\x1" + "(.*)" + "\x1" + "$", 
@@ -26,7 +27,7 @@ namespace ReactiveIRC.Protocol
         private static readonly Regex NoticeRegex = new Regex("^NOTICE ([^:]*?) :(.*)$", RegexOptions.Compiled);
         private static readonly Regex InviteRegex = new Regex("^INVITE (.*) (.*)$", RegexOptions.Compiled);
         private static readonly Regex JoinRegex = new Regex("^JOIN :?(.*)$", RegexOptions.Compiled);
-        private static readonly Regex TopicRegex = new Regex("^TOPIC ([^:]*?) :(.*)$", RegexOptions.Compiled);
+        private static readonly Regex TopicRegex = new Regex("^TOPIC ([^:]*?) :?(.*)$", RegexOptions.Compiled);
         private static readonly Regex NickRegex = new Regex("^NICK :?(.*)$", RegexOptions.Compiled);
         private static readonly Regex KickRegex = new Regex("^KICK (.*) :?(.*)$", RegexOptions.Compiled);
         private static readonly Regex PartRegex = new Regex("^PART :?(.*)$", RegexOptions.Compiled);
@@ -53,6 +54,10 @@ namespace ReactiveIRC.Protocol
                 line = raw.Substring(1);
             else
                 line = raw;
+
+            // Try to parse messages without prefixes.
+            ReceiveMessage message = ParseNoPrefixMessage(line);
+            if(message != null) return message;
 
             // Tokenize
             String[] tokens = line.Split(new []{' '}, 3);
@@ -171,6 +176,18 @@ namespace ReactiveIRC.Protocol
             return Tuple.Create(ReceiveType.Unknown, ReplyType.Unknown);
         }
 
+        private ReceiveMessage ParseNoPrefixMessage(String line)
+        {
+            ReceiveMessage message = null;
+
+            message = ParseUndirectedMessage(PingRegex, ReceiveType.Ping, Connection.Network, line);
+            if(message != null) return message;
+            message = ParseUndirectedMessage(ErrorRegex, ReceiveType.Error, Connection.Network, line);
+            if(message != null) return message;
+
+            return message;
+        }
+
         private ReceiveMessage ParseInformationMessage(IMessageTarget sender, ReceiveType type, ReplyType replyType, String parameters)
         {
             return new ReceiveMessage(Connection, parameters, sender, type, replyType, Connection.Me);
@@ -180,11 +197,6 @@ namespace ReactiveIRC.Protocol
         {
             ReceiveMessage message = null;
 
-            message = ParseUndirectedMessage(PingRegex, ReceiveType.Ping, sender, line);
-            if(message != null) return message;
-            message = ParseUndirectedMessage(ErrorRegex, ReceiveType.Ping, sender, line);
-            if(message != null) return message;
-
             message = ParseDirectedMessage(ActionRegex, ReceiveType.Action, sender, line);
             if(message != null) return message;
             message = ParseDirectedMessage(MessageRegex, ReceiveType.Message, sender, line);
@@ -192,8 +204,8 @@ namespace ReactiveIRC.Protocol
             message = ParseDirectedMessage(ActionRegex, ReceiveType.Notice, sender, line);
             if(message != null) return message;
 
-            //message = ParseDirectedMessage(InviteRegex, ReceiveType.Invite, sender, line, offset);
-            //if(message != null) return message;
+            message = ParseInviteMessage(sender, line);
+            if(message != null) return message;
 
             message = ParseDirectedMessage(JoinRegex, ReceiveType.Join, sender, line);
             if(message != null) return message;
@@ -216,14 +228,14 @@ namespace ReactiveIRC.Protocol
 
         private ReceiveMessage ParseUndirectedMessage(Regex regex, ReceiveType type, IMessageTarget sender, String line)
         {
-            Match results = PingRegex.Match(line);
+            Match results = regex.Match(line);
             if(results.Success)
             {
                 String message = String.Empty;
                 if(results.Groups[1].Success)
                     message = results.Groups[1].Value;
 
-                return new ReceiveMessage(Connection, message, sender, ReceiveType.Ping, ReplyType.Unknown, 
+                return new ReceiveMessage(Connection, message, sender, type, ReplyType.Unknown, 
                     Connection.Me);
             }
             return null;
