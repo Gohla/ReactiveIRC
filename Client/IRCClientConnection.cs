@@ -240,6 +240,7 @@ namespace ReactiveIRC.Client
             _users.ChangeItemKey(user, nickname);
             user.Channels.Cast<Channel>().Do(c => c.ChangeName(user.Name, nickname));
             user.Name.Value = nickname;
+            user.Identity.Name.Value = nickname;
         }
 
         private void HandlePing(IReceiveMessage message)
@@ -533,12 +534,12 @@ namespace ReactiveIRC.Client
 
         private void HandleAwayReply(IReceiveMessage message)
         {
-
+            _me.Away.Value = true;
         }
 
         private void HandleUnAwayReply(IReceiveMessage message)
         {
-
+            _me.Away.Value = false;
         }
 
         public int CompareTo(IClientConnection other)
