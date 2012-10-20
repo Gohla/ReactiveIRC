@@ -112,62 +112,14 @@ namespace ReactiveIRC.Protocol
                 int intCode;
                 if(int.TryParse(code, out intCode))
                 {
-                    ReplyType reply = (ReplyType)intCode;
-                    switch(reply)
+                    if(Enum.IsDefined(typeof(ReplyType), intCode))
                     {
-                        case ReplyType.Welcome:
-                        case ReplyType.YourHost:
-                        case ReplyType.Created:
-                        case ReplyType.MyInfo:
-                        case ReplyType.Bounce:
-                            return Tuple.Create(ReceiveType.Login, reply);
-                        case ReplyType.LuserClient:
-                        case ReplyType.LuserOp:
-                        case ReplyType.LuserUnknown:
-                        case ReplyType.LuserMe:
-                        case ReplyType.LuserChannels:
-                            return Tuple.Create(ReceiveType.Info, reply);
-                        case ReplyType.MotdStart:
-                        case ReplyType.Motd:
-                        case ReplyType.EndOfMotd:
-                            return Tuple.Create(ReceiveType.Motd, reply);
-                        case ReplyType.NamesReply:
-                        case ReplyType.EndOfNames:
-                            return Tuple.Create(ReceiveType.Name, reply);
-                        case ReplyType.WhoReply:
-                        case ReplyType.EndOfWho:
-                            return Tuple.Create(ReceiveType.Who, reply);
-                        case ReplyType.ListStart:
-                        case ReplyType.List:
-                        case ReplyType.ListEnd:
-                            return Tuple.Create(ReceiveType.List, reply);
-                        case ReplyType.BanList:
-                        case ReplyType.EndOfBanList:
-                            return Tuple.Create(ReceiveType.BanList, reply);
-                        case ReplyType.TopicSetBy:
-                        case ReplyType.Topic:
-                        case ReplyType.NoTopic:
-                            return Tuple.Create(ReceiveType.Topic, reply);
-                        case ReplyType.WhoIsUser:
-                        case ReplyType.WhoIsServer:
-                        case ReplyType.WhoIsOperator:
-                        case ReplyType.WhoIsIdle:
-                        case ReplyType.WhoIsChannels:
-                        case ReplyType.EndOfWhoIs:
-                            return Tuple.Create(ReceiveType.WhoIs, reply);
-                        case ReplyType.WhoWasUser:
-                        case ReplyType.EndOfWhoWas:
-                            return Tuple.Create(ReceiveType.WhoWas, reply);
-                        case ReplyType.UserModeIs:
-                            return Tuple.Create(ReceiveType.UserMode, reply);
-                        case ReplyType.CreatedAt:
-                        case ReplyType.ChannelModeIs:
-                            return Tuple.Create(ReceiveType.ChannelMode, reply);
-                        default:
-                            if((intCode >= 400) && (intCode <= 599))
-                                return Tuple.Create(ReceiveType.Error, reply);
-                            else
-                                return Tuple.Create(ReceiveType.Unknown, reply);
+                        ReplyType reply = (ReplyType)intCode;
+
+                        if((intCode >= 400) && (intCode <= 599))
+                            return Tuple.Create(ReceiveType.Error, reply);
+                        else
+                            return Tuple.Create(ReceiveType.Reply, reply);
                     }
                 }
             }

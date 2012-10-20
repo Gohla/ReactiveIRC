@@ -6,26 +6,9 @@
     public enum ReceiveType
     {
         Unknown
-
-      // Server information messages.
-      , Ping
-      , Login
-      , Info
-      , Motd
-      , Name
-      , List
-      , Topic
-      , UserMode
-      , ChannelMode
-      , BanList
-      , Who
-      , WhoIs
-      , WhoWas
-      , Error
-
-      // User interaction messages.
-
-                            // Sender types                     -> Receiver types
+      , Reply               // {INetwork}                       -> {Me}
+      , Error               // {INetwork}                       -> {Me}
+      , Ping                // {INetwork}                       -> {Me}
       , Message	            // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
       , Action              // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
       , Notice              // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
