@@ -29,6 +29,11 @@ namespace ReactiveIRC.Interface
         IObservableCollection<IChannel> Channels { get; }
 
         /// <summary>
+        /// Gets the modes of the user.
+        /// </summary>
+        Mode Modes { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the user is marked as away. Subscribe to receive changes.
         /// </summary>
         ObservableProperty<bool> Away { get; }

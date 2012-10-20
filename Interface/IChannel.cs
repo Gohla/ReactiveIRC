@@ -29,8 +29,18 @@ namespace ReactiveIRC.Interface
         IObservableCollection<IChannelUser> Users { get; }
 
         /// <summary>
+        /// Gets the modes of the channel.
+        /// </summary>
+        Mode Modes { get; }
+
+        /// <summary>
         /// Gets the topic of the channel. Subscribe to receive changes.
         /// </summary>
         ObservableProperty<String> Topic { get; }
+
+        /// <summary>
+        /// Gets the channel user with given nickname.
+        /// </summary>
+        IChannelUser GetUser(String nickname);
     }
 }

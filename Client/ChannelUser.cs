@@ -7,11 +7,9 @@ namespace ReactiveIRC.Client
 {
     public class ChannelUser : IChannelUser
     {
-        private ObservableProperty<UserMode> _userModes = new ObservableProperty<UserMode>(UserMode.None);
-
         public IChannel Channel { get; private set; }
         public IUser User { get; private set; }
-        public ObservableProperty<UserMode> UserModes { get { return _userModes; } }
+        public Mode Modes { get; private set; }
 
         public IClientConnection Connection { get; private set; }
         public MessageTargetType Type { get { return MessageTargetType.ChannelUser; } }
@@ -24,6 +22,7 @@ namespace ReactiveIRC.Client
             Connection = connection;
             Channel = channel;
             User = user;
+            Modes = new Mode();
         }
 
         public int CompareTo(IChannel other)

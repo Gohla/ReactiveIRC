@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using Gohla.Shared;
+using NLog;
 using ReactiveIRC.Interface;
 
 namespace ReactiveIRC.Client
 {
     public class Channel : IChannel
     {
+        protected static readonly Logger _logger = NLog.LogManager.GetLogger("Channel");
+
         private KeyedCollection<String, IChannelUser> _users = new KeyedCollection<String, IChannelUser>();
         private ObservableProperty<String> _topic = new ObservableProperty<String>(String.Empty);
 
@@ -16,6 +19,7 @@ namespace ReactiveIRC.Client
         public IObservable<ISendMessage> SentMessages { get; private set; }
 
         public IObservableCollection<IChannelUser> Users { get { return _users; } }
+        public Mode Modes { get; private set; }
         public ObservableProperty<String> Topic { get { return _topic; } }
 
         public IClientConnection Connection { get; private set; }
@@ -28,6 +32,7 @@ namespace ReactiveIRC.Client
         {
             Connection = connection;
             Name = new ObservableProperty<String>(name);
+            Modes = new Mode();
 
             Messages = connection.Messages
                 .Where(m => m.Receivers.Contains(this))
@@ -40,20 +45,43 @@ namespace ReactiveIRC.Client
                 ;
         }
 
-        internal void AddUser(IUser user)
+        public IChannelUser GetUser(String nickname)
         {
-            _users.Add(new ChannelUser(Connection, this, user));
+            if(_users.Contains(nickname))
+                return _users[nickname];
+
+            IUser user = Connection.GetUser(nickname);
+            return AddUser(user);
         }
 
-        internal void RemoveUser(String user)
+        internal IChannelUser AddUser(IUser user)
         {
-            _users.Remove(user);
+            if(_users.Contains(user.Name))
+                return _users[user.Name];
+
+            ChannelUser channelUser = new ChannelUser(Connection, this, user);
+            _users.Add(channelUser);
+            return channelUser;
         }
 
-        internal void ChangeNickname(String oldname, String nickname)
+        internal bool RemoveUser(String nickname)
         {
-            IChannelUser channelUser = _users[oldname];
-            _users.ChangeItemKey(channelUser, nickname);
+            return _users.Remove(nickname);
+        }
+
+        internal void ChangeName(String oldNickname, String newNickname)
+        {
+            if(_users.Contains(newNickname))
+            {
+                _logger.Error("Changing nickname " + oldNickname + " into " + newNickname +
+                    ", but a channel user with that nickname already exists. Some observable subscriptions may be lost.");
+
+                _users.Remove(oldNickname);
+                return;
+            }
+
+            IChannelUser channelUser = _users[oldNickname];
+            _users.ChangeItemKey(channelUser, newNickname);
         }
 
         public int CompareTo(IChannel other)

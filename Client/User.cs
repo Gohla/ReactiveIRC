@@ -17,7 +17,7 @@ namespace ReactiveIRC.Client
         public IObservable<ISendMessage> SentMessages { get; private set; }
 
         public IObservableCollection<IChannel> Channels { get { return _channels; } }
-
+        public Mode Modes { get; private set; }
         public ObservableProperty<bool> Away { get { return _away; } }
 
         public IClientConnection Connection { get; private set; }
@@ -29,6 +29,7 @@ namespace ReactiveIRC.Client
         public User(IClientConnection connection, String name)
         {
             Connection = connection;
+            Modes = new Mode();
             _name = new ObservableProperty<String>(name);
 
             Messages = connection.Messages
@@ -50,11 +51,6 @@ namespace ReactiveIRC.Client
         internal void RemoveChannel(String channel)
         {
             _channels.Remove(channel);
-        }
-
-        internal void SetNickname(String nickname)
-        {
-            _name.Value = nickname;
         }
 
         public int CompareTo(IUser other)

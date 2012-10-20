@@ -65,6 +65,7 @@
     <Compile Include="IReceiveMessage.cs" />
     <Compile Include="ISendMessage.cs" />
     <Compile Include="IUser.cs" />
+    <Compile Include="Mode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReceiveType.cs" />
     <Compile Include="ReplyType.cs" />

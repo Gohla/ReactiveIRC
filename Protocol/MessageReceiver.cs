@@ -17,21 +17,21 @@ namespace ReactiveIRC.Protocol
         private static readonly Regex PingRegex = new Regex("^PING :?(.*)", RegexOptions.Compiled);
         private static readonly Regex ErrorRegex = new Regex("^ERROR :?(.*)", RegexOptions.Compiled);
 
-        private static readonly Regex ActionRegex = new Regex("^PRIVMSG ([^:]*?) :" + "\x1" + "ACTION (.*)" + "\x1" + "$", 
+        private static readonly Regex ActionRegex = new Regex("^PRIVMSG ([^: ]*?) :" + "\x1" + "ACTION (.*)" + "\x1" + "$", 
             RegexOptions.Compiled);
-        private static readonly Regex CtcpRequestRegex = new Regex("^PRIVMSG ([^:]*?) :" + "\x1" + "(.*)" + "\x1" + "$", 
+        private static readonly Regex CtcpRequestRegex = new Regex("^PRIVMSG ([^: ]*?) :" + "\x1" + "(.*)" + "\x1" + "$", 
             RegexOptions.Compiled);
-        private static readonly Regex MessageRegex = new Regex("^PRIVMSG ([^:]*?) :(.*)$", RegexOptions.Compiled);
-        private static readonly Regex CtcpReplyRegex = new Regex("^NOTICE ([^:]*?) :" + "\x1" + "(.*)" + "\x1" + "$",
+        private static readonly Regex MessageRegex = new Regex("^PRIVMSG ([^: ]*?) :(.*)$", RegexOptions.Compiled);
+        private static readonly Regex CtcpReplyRegex = new Regex("^NOTICE ([^: ]*?) :" + "\x1" + "(.*)" + "\x1" + "$",
             RegexOptions.Compiled);
-        private static readonly Regex NoticeRegex = new Regex("^NOTICE ([^:]*?) :(.*)$", RegexOptions.Compiled);
-        private static readonly Regex InviteRegex = new Regex("^INVITE (.*) (.*)$", RegexOptions.Compiled);
-        private static readonly Regex JoinRegex = new Regex("^JOIN :?(.*)$", RegexOptions.Compiled);
-        private static readonly Regex TopicRegex = new Regex("^TOPIC ([^:]*?) :?(.*)$", RegexOptions.Compiled);
-        private static readonly Regex NickRegex = new Regex("^NICK :?(.*)$", RegexOptions.Compiled);
-        private static readonly Regex KickRegex = new Regex("^KICK (.*) :?(.*)$", RegexOptions.Compiled);
-        private static readonly Regex PartRegex = new Regex("^PART :?(.*)$", RegexOptions.Compiled);
-        private static readonly Regex ModeRegex = new Regex("^MODE (.*) :?(.*)$", RegexOptions.Compiled);
+        private static readonly Regex NoticeRegex = new Regex("^NOTICE ([^: ]*?) :(.*)$", RegexOptions.Compiled);
+        private static readonly Regex InviteRegex = new Regex("^INVITE ([^: ]*) ([^: ]*)$", RegexOptions.Compiled);
+        private static readonly Regex JoinRegex = new Regex("^JOIN :?([^: ]*)$", RegexOptions.Compiled);
+        private static readonly Regex TopicRegex = new Regex("^TOPIC ([^: ]*?) :?(.*)$", RegexOptions.Compiled);
+        private static readonly Regex NickRegex = new Regex("^NICK :?([^: ]*)$", RegexOptions.Compiled);
+        private static readonly Regex KickRegex = new Regex("^KICK ([^: ]*?) :?(.*)$", RegexOptions.Compiled);
+        private static readonly Regex PartRegex = new Regex("^PART ([^: ]*?)(?: :(.*))?$", RegexOptions.Compiled);
+        private static readonly Regex ModeRegex = new Regex("^MODE ([^: ]*?) :?(.*)$", RegexOptions.Compiled);
         private static readonly Regex QuitRegex = new Regex("^QUIT :?(.*)$", RegexOptions.Compiled);
 
         public IClientConnection Connection { get; private set; }

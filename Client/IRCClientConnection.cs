@@ -200,9 +200,21 @@ namespace ReactiveIRC.Client
 
         private void ChangeNickname(User user, String nickname)
         {
+            if(_users.Contains(nickname))
+            {
+                _logger.Error("Changing nickname of " + user.Name + " into " + nickname +
+                    ", but a user with that nickname already exists. Some observable subscriptions may be lost.");
+
+                if(user.Equals(_me))
+                    _me = _users[nickname] as User;
+                user.Channels.Cast<Channel>().Do(c => c.ChangeName(user.Name, nickname));
+                _users.Remove(user);
+                return;
+            }
+
             _users.ChangeItemKey(user, nickname);
-            user.Channels.Cast<Channel>().Do(c => c.ChangeNickname(user.Name, nickname));
-            user.SetNickname(nickname);
+            user.Channels.Cast<Channel>().Do(c => c.ChangeName(user.Name, nickname));
+            user.Name.Value = nickname;
         }
 
         private void HandlePing(IReceiveMessage message)
@@ -250,17 +262,60 @@ namespace ReactiveIRC.Client
 
         private void HandleTopicChange(IReceiveMessage message)
         {
+            if(message.Receivers.Count != 1)
+            {
+                _logger.Error("Topic change message with no or more than one receiver.");
+                return;
+            }
 
+            Channel channel = message.Receivers.First() as Channel;
+            channel.Topic.Value = message.Contents;
         }
 
         private void HandleChannelModeChange(IReceiveMessage message)
         {
+            if(message.Receivers.Count != 1)
+            {
+                _logger.Error("Channel mode change message with no or more than one receiver.");
+                return;
+            }
 
+            Channel channel = message.Receivers.First() as Channel;
+
+            String[] split = message.Contents.Split(new[] { ' ' }, 2);
+            if(split.Length == 1)
+            {
+                channel.Modes.ParseAndApply(split[0]);
+            }
+            else
+            {
+                ModeChange[] changes = Mode.Parse(split[0]);
+                String[] nicknames = split[1].Split(' ');
+
+                if(changes.Length != nicknames.Length)
+                {
+                    _logger.Error("Length of changes does not match length of nicknames.");
+                    return;
+                }
+
+                for(int i = 0; i < changes.Length; ++i)
+                {
+                    ChannelUser channelUser = channel.GetUser(nicknames[i]) as ChannelUser;
+                    channelUser.Modes.Apply(changes[i]);
+                }
+            }
         }
 
         private void HandleUserModeChange(IReceiveMessage message)
         {
+            if(message.Receivers.Count != 1)
+            {
+                _logger.Error("User mode change message with no or more than one receiver.");
+                return;
+            }
 
+            User user = message.Receivers.First() as User;
+            user.Modes.ParseAndApply(message.Contents);
         }
 
         private void HandleWelcome(IReceiveMessage message)
