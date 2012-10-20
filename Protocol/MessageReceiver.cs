@@ -10,8 +10,6 @@ namespace ReactiveIRC.Protocol
 {
     public class MessageReceiver
     {
-        private static readonly Regex PrefixRegex = new Regex("(?:([^!@]*)!)?(?:([^!@]*)@)?([^!@]*)", 
-            RegexOptions.Compiled);
         private static readonly Regex CommandRegex = new Regex("^([0-9]{3})$", RegexOptions.Compiled);
 
         private static readonly Regex PingRegex = new Regex("^PING :?(.*)", RegexOptions.Compiled);
@@ -82,24 +80,21 @@ namespace ReactiveIRC.Protocol
 
         private IMessageTarget ParseSender(String prefix)
         {
-            Match results = PrefixRegex.Match(prefix);
-            String name = null;
-            String ident = null;
-            String host = null;
+            IIdentity identity = Identity.Parse(prefix);
 
-            if(!results.Success)
+            if(identity == null)
                 throw new ArgumentException("Does not contain IRC prefix", "raw");
-            if(results.Groups[1].Success)
-                name = results.Groups[1].Value;
-            if(results.Groups[2].Success)
-                ident = results.Groups[2].Value;
-            if(results.Groups[3].Success)
-                host = results.Groups[3].Value;
 
-            if(name != null)
-                return Connection.GetUser(name);
+            if(!String.IsNullOrWhiteSpace(identity.Name.Value))
+            {
+                IUser user = Connection.GetUser(identity.Name);
+                // TODO: Is setting host and ident necessary?
+                user.Identity.Host.Value = identity.Host;
+                user.Identity.Ident.Value = identity.Ident;
+                return user;
+            }
             else
-                return Connection.GetNetwork(host);
+                return Connection.GetNetwork(identity.Host);
         }
 
         private Tuple<ReceiveType, ReplyType> ParseMessageType(String command)
@@ -132,15 +127,18 @@ namespace ReactiveIRC.Protocol
         {
             ReceiveMessage message = null;
 
-            message = ParseUndirectedMessage(PingRegex, ReceiveType.Ping, Connection.Network, line, Connection.Me);
+            message = ParseUndirectedMessage(PingRegex, ReceiveType.Ping, Connection.Me.Network.Value, line, 
+                Connection.Me);
             if(message != null) return message;
-            message = ParseUndirectedMessage(ErrorRegex, ReceiveType.Error, Connection.Network, line, Connection.Me);
+            message = ParseUndirectedMessage(ErrorRegex, ReceiveType.Error, Connection.Me.Network.Value, line, 
+                Connection.Me);
             if(message != null) return message;
 
             return message;
         }
 
-        private ReceiveMessage ParseInformationMessage(IMessageTarget sender, ReceiveType type, ReplyType replyType, String parameters)
+        private ReceiveMessage ParseInformationMessage(IMessageTarget sender, ReceiveType type, ReplyType replyType, 
+            String parameters)
         {
             return new ReceiveMessage(Connection, parameters, sender, type, replyType, Connection.Me);
         }
@@ -165,9 +163,10 @@ namespace ReactiveIRC.Protocol
             message = ParseDirectedMessage(TopicRegex, ReceiveType.TopicChange, sender, line);
             if(message != null) return message;
 
-            message = ParseUndirectedMessage(NickRegex, ReceiveType.NickChange, sender, line, Connection.Network);
+            message = ParseUndirectedMessage(NickRegex, ReceiveType.NickChange, sender, line, 
+                Connection.Me.Network.Value);
             if(message != null) return message;
-            message = ParseUndirectedMessage(QuitRegex, ReceiveType.Quit, sender, line, Connection.Network);
+            message = ParseUndirectedMessage(QuitRegex, ReceiveType.Quit, sender, line, Connection.Me.Network.Value);
             if(message != null) return message;
 
             message = ParseModeMessage(sender, line);

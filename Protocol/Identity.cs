@@ -1,61 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using Gohla.Shared;
 using ReactiveIRC.Interface;
 
 namespace ReactiveIRC.Protocol
 {
     public class Identity : IIdentity
     {
-        private String _name;
-        private String _ident;
-        private String _host;
+        private static readonly Regex PrefixRegex = new Regex("(?:([^!@]*)!)?(?:([^!@]*)@)?([^!@]*)", 
+            RegexOptions.Compiled);
 
-        public String Name
-        {
-            get
-            {
-                return _name == null ? "unknown" : _name;
-            }
-            set
-            {
-                _name = value;
-            }
-        }
-
-        public String Ident
-        {
-            get
-            {
-                return _ident == null ? "unknown" : _ident;
-            }
-        }
-
-        public String Host
-        {
-            get
-            {
-                return _host == null ? "unknown" : _host;
-            }
-        }
-
-        public bool HasName { get { return _name != null; } }
-
-        public bool HasIdent { get { return _ident != null; } }
-
-        public bool CompareByName
-        {
-            get
-            {
-                //return _ident == null || _host == null;
-                return true;
-            }
-        }
+        public ObservableProperty<String> Name { get; private set; }
+        public ObservableProperty<String> Ident { get; private set; }
+        public ObservableProperty<String> Host { get; private set; }
 
         public Identity(String name, String ident, String host)
         {
-            _name = name;
-            _ident = ident;
-            _host = host;
+            Name = new ObservableProperty<String>(name);
+            Ident = new ObservableProperty<String>(ident);
+            Host = new ObservableProperty<String>(host);
+        }
+
+        public static IIdentity Parse(String str)
+        {
+            Match results = PrefixRegex.Match(str);
+
+            if(!results.Success)
+                return null;
+
+            String name = null;
+            String ident = null;
+            String host = null;
+
+            if(results.Groups[1].Success)
+                name = results.Groups[1].Value;
+            if(results.Groups[2].Success)
+                ident = results.Groups[2].Value;
+            if(results.Groups[3].Success)
+                host = results.Groups[3].Value;
+
+            return new Identity(name, ident, host);
         }
 
         public int CompareTo(IIdentity other)
@@ -63,20 +48,13 @@ namespace ReactiveIRC.Protocol
             if(ReferenceEquals(other, null))
                 return 1;
 
-            if(this.CompareByName || other.CompareByName)
-            {
-                int result = 0;
-                result = this.Name.CompareTo(other.Name);
-                return result;
-            }
-            else
-            {
-                int result = 0;
-                result = this.Ident.CompareTo(other.Ident);
-                if(result == 0)
-                    result = this.Host.CompareTo(other.Host);
-                return result;
-            }
+            int result = 0;
+            result = this.Name.Value.CompareTo(other.Name);
+            if(result == 0)
+                result = this.Ident.Value.CompareTo(other.Ident);
+            if(result == 0)
+                result = this.Host.Value.CompareTo(other.Host);
+            return result;
         }
 
         public override bool Equals(object other)
@@ -92,19 +70,11 @@ namespace ReactiveIRC.Protocol
             if(ReferenceEquals(other, null))
                 return false;
 
-            if(this.CompareByName || other.CompareByName)
-            {
-                return
-                    EqualityComparer<String>.Default.Equals(this.Name, other.Name)
-                 ;
-            }
-            else
-            {
-                return
-                    EqualityComparer<String>.Default.Equals(this.Ident, other.Ident)
-                 && EqualityComparer<String>.Default.Equals(this.Host, other.Host)
-                 ;
-            }
+            return
+                EqualityComparer<String>.Default.Equals(this.Name, other.Name)
+             && EqualityComparer<String>.Default.Equals(this.Ident, other.Ident)
+             && EqualityComparer<String>.Default.Equals(this.Host, other.Host)
+             ;
         }
 
         public override int GetHashCode()
@@ -112,15 +82,9 @@ namespace ReactiveIRC.Protocol
             unchecked
             {
                 int hash = 17;
-                if(this.CompareByName)
-                {
-                    hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name);
-                }
-                else
-                {
-                    hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Ident);
-                    hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Host);
-                }
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name);
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Ident);
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Host);
                 return hash;
             }
         }

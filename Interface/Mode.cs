@@ -13,21 +13,24 @@ namespace ReactiveIRC.Interface
     public class Mode
     {
         public ObservableHashSet<char> Modes { get; private set; }
-        public String ModesString { get { return Modes.ToString(""); } }
+        public ObservableProperty<String> ModesString { get; private set; }
 
         public Mode()
         {
             Modes = new ObservableHashSet<char>();
+            ModesString = new ObservableProperty<String>(String.Empty);
         }
 
         public void AddMode(char mode)
         {
             Modes.Add(mode);
+            ModesString.Value = "+" + Modes.ToString();
         }
 
         public void RemoveMode(char mode)
         {
             Modes.Remove(mode);
+            ModesString.Value = "+" + Modes.ToString();
         }
 
         public void Apply(ModeChange change)

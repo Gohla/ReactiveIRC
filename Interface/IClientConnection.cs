@@ -25,11 +25,6 @@ namespace ReactiveIRC.Interface
         IUser Me { get; }
 
         /// <summary>
-        /// Gets the network.
-        /// </summary>
-        INetwork Network { get; }
-
-        /// <summary>
         /// Gets the known channels. Can contain invalid channels.
         /// </summary>
         IObservableCollection<IChannel> Channels { get; }

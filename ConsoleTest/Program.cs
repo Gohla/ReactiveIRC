@@ -23,7 +23,7 @@ namespace ReactiveIRC.ConsoleTest
 
             while(true)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(50);
             }
         }
 

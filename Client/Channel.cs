@@ -12,7 +12,6 @@ namespace ReactiveIRC.Client
         protected static readonly Logger _logger = NLog.LogManager.GetLogger("Channel");
 
         private KeyedCollection<String, IChannelUser> _users = new KeyedCollection<String, IChannelUser>();
-        private ObservableProperty<String> _topic = new ObservableProperty<String>(String.Empty);
 
         public IObservable<IMessage> Messages { get; private set; }
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
@@ -20,7 +19,10 @@ namespace ReactiveIRC.Client
 
         public IObservableCollection<IChannelUser> Users { get { return _users; } }
         public Mode Modes { get; private set; }
-        public ObservableProperty<String> Topic { get { return _topic; } }
+        public ObservableProperty<String> Topic { get; private set; }
+        public ObservableProperty<IUser> TopicSetBy { get; private set; }
+        public ObservableProperty<uint> TopicSetDate { get; private set; }
+        public ObservableProperty<uint> CreatedDate { get; private set; }
 
         public IClientConnection Connection { get; private set; }
         public MessageTargetType Type { get { return MessageTargetType.Channel; } }
@@ -33,6 +35,10 @@ namespace ReactiveIRC.Client
             Connection = connection;
             Name = new ObservableProperty<String>(name);
             Modes = new Mode();
+            Topic = new ObservableProperty<String>(String.Empty);
+            TopicSetBy = new ObservableProperty<IUser>(null);
+            TopicSetDate = new ObservableProperty<uint>(0);
+            CreatedDate = new ObservableProperty<uint>(0);
 
             Messages = connection.Messages
                 .Where(m => m.Receivers.Contains(this))
@@ -54,14 +60,10 @@ namespace ReactiveIRC.Client
             return AddUser(user);
         }
 
-        internal IChannelUser AddUser(IUser user)
+        internal ChannelUser AddUser(IUser user)
         {
             if(_users.Contains(user.Name))
-            {
-                _logger.Error("Trying to add user " + user.Name + " to channel " + Name + 
-                    ", but user is already in this channel.");
-                return _users[user.Name];
-            }
+                return _users[user.Name] as ChannelUser;
 
             ChannelUser channelUser = new ChannelUser(Connection, this, user);
             _users.Add(channelUser);

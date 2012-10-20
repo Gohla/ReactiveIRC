@@ -29,12 +29,28 @@ namespace ReactiveIRC.Interface
         IObservableCollection<IChannel> Channels { get; }
 
         /// <summary>
+        /// Gets the identity of the user.
+        /// </summary>
+        IIdentity Identity { get; }
+
+        /// <summary>
+        /// Gets the real name of the user. Initially set to the empty String. Subscribe to receive changes.
+        /// </summary>
+        ObservableProperty<String> RealName { get; }
+
+        /// <summary>
+        /// Gets the network the user is on. Initially null. Subscribe to receive changes.
+        /// </summary>
+        ObservableProperty<INetwork> Network { get; }
+
+        /// <summary>
         /// Gets the modes of the user.
         /// </summary>
         Mode Modes { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the user is marked as away. Subscribe to receive changes.
+        /// Gets a value indicating whether the user is marked as away. Initially set to false. Subscribe to receive
+        /// changes.
         /// </summary>
         ObservableProperty<bool> Away { get; }
     }

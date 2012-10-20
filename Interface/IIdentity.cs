@@ -1,4 +1,5 @@
 ﻿using System;
+using Gohla.Shared;
 
 namespace ReactiveIRC.Interface
 {
@@ -8,33 +9,18 @@ namespace ReactiveIRC.Interface
     public interface IIdentity : IEquatable<IIdentity>, IComparable<IIdentity>
     {
         /// <summary>
-        /// Gets the name.
+        /// Gets the name. Initially set to nickname of user. Subscribe to receive changes.
         /// </summary>
-        String Name { get; set; }
+        ObservableProperty<String> Name { get; }
 
         /// <summary>
-        /// Gets the identifier.
+        /// Gets the identifier. Initially the empty string. Subscribe to receive changes.
         /// </summary>
-        String Ident { get; }
+        ObservableProperty<String> Ident { get; }
 
         /// <summary>
-        /// Gets the host.
+        /// Gets the host. Initially the empty string. Subscribe to receive changes.
         /// </summary>
-        String Host { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether this identity has a name.
-        /// </summary>
-        bool HasName { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether this identity has an ident.
-        /// </summary>
-        bool HasIdent { get; }
-
-        /// <summary>
-        /// Queries if this identity will be compared by Name instead of Ident and Host.
-        /// </summary>
-        bool CompareByName { get; }
+        ObservableProperty<String> Host { get; }
     }
 }

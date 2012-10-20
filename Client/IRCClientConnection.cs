@@ -19,7 +19,6 @@ namespace ReactiveIRC.Client
         private MessageSender _messageSender;
         private MessageReceiver _messageReceiver;
         private User _me;
-        private Network _network;
         private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
         private KeyedCollection<String, IUser> _users = new KeyedCollection<String, IUser>();
         private Subject<IMessage> _messages = new Subject<IMessage>();
@@ -27,7 +26,6 @@ namespace ReactiveIRC.Client
         private Subject<ISendMessage> _sentMessages = new Subject<ISendMessage>();
 
         public IUser Me { get { return _me; } }
-        public INetwork Network { get { return _network; } }
         public IObservableCollection<IChannel> Channels { get { return _channels; } }
         public IObservableCollection<IUser> Users { get { return _users; } }
         public IObservable<IMessage> Messages { get { return _messages; } }
@@ -88,23 +86,35 @@ namespace ReactiveIRC.Client
                 ;
             _receivedMessages
                 .Where(m => m.ReplyType == ReplyType.ChannelModeIs)
-                .Subscribe(HandleChannelModeIs)
+                .Subscribe(HandleChannelModeIsReply)
+                ;
+            _receivedMessages
+                .Where(m => m.ReplyType == ReplyType.CreatedAt)
+                .Subscribe(HandleCreatedAtReply)
                 ;
             _receivedMessages
                 .Where(m => m.ReplyType == ReplyType.Topic)
-                .Subscribe(HandleTopic)
+                .Subscribe(HandleTopicReply)
+                ;
+            _receivedMessages
+                .Where(m => m.ReplyType == ReplyType.TopicSetBy)
+                .Subscribe(HandleTopicSetByReply)
                 ;
             _receivedMessages
                 .Where(m => m.ReplyType == ReplyType.NamesReply)
                 .Subscribe(HandleNamesReply)
                 ;
             _receivedMessages
+                .Where(m => m.ReplyType == ReplyType.WhoReply)
+                .Subscribe(HandleWhoReply)
+                ;
+            _receivedMessages
                 .Where(m => m.ReplyType == ReplyType.Away)
-                .Subscribe(HandleAway)
+                .Subscribe(HandleAwayReply)
                 ;
             _receivedMessages
                 .Where(m => m.ReplyType == ReplyType.UnAway)
-                .Subscribe(HandleUnAway)
+                .Subscribe(HandleUnAwayReply)
                 ;
         }
 
@@ -116,6 +126,16 @@ namespace ReactiveIRC.Client
                 messages
                     .Select(m => WriteRaw(m.Raw))
             );
+        }
+
+        public void SendAndForget(params ISendMessage[] messages)
+        {
+            messages.Do(m => _sentMessages.OnNext(m));
+
+            Observable.Merge(
+                messages
+                    .Select(m => WriteRaw(m.Raw))
+            ).Subscribe();
         }
 
         public IObservable<Unit> Login(String nickname)
@@ -172,17 +192,17 @@ namespace ReactiveIRC.Client
             return user;
         }
 
-        private void AddUserToChannel(String nickname, String channelName)
+        private ChannelUser AddUserToChannel(String nickname, String channelName)
         {
             User user = GetChannel(nickname) as User;
             Channel channel = GetUser(channelName) as Channel;
-            AddUserToChannel(user, channel);
+            return AddUserToChannel(user, channel);
         }
 
-        private void AddUserToChannel(User user, Channel channel)
+        private ChannelUser AddUserToChannel(User user, Channel channel)
         {
-            channel.AddUser(user);
             user.AddChannel(channel);
+            return channel.AddUser(user);
         }
 
         private void RemoveUserFromChannel(String nickname, String channelName)
@@ -224,7 +244,7 @@ namespace ReactiveIRC.Client
 
         private void HandlePing(IReceiveMessage message)
         {
-            Send(_messageSender.Pong(message.Contents)).Subscribe();
+            SendAndForget(_messageSender.Pong(message.Contents));
         }
 
         private void HandleJoin(IReceiveMessage message)
@@ -238,6 +258,18 @@ namespace ReactiveIRC.Client
             User user = message.Sender as User;
             Channel channel = message.Receivers.First() as Channel;
             AddUserToChannel(user, channel);
+
+            if(_me.Equals(user))
+            {
+                SendAndForget(
+                    _messageSender.Mode(channel.Name)
+                  , _messageSender.Who(channel.Name)
+                );
+            }
+            else
+            {
+                SendAndForget(_messageSender.Who(user.Name));
+            }
         }
 
         private void HandlePart(IReceiveMessage message)
@@ -268,7 +300,8 @@ namespace ReactiveIRC.Client
         private void HandleQuit(IReceiveMessage message)
         {
             User user = message.Sender as User;
-            user.Channels.Cast<Channel>().Do(c => RemoveUserFromChannel(user, c));
+            Channel[] channels = user.Channels.Cast<Channel>().ToArray();
+            channels.Do(c => RemoveUserFromChannel(user, c));
             _users.Remove(user);
         }
 
@@ -334,30 +367,176 @@ namespace ReactiveIRC.Client
         {
             String nickname = message.Contents.Split(new[] { ' ' }, 2)[0];
             ChangeNickname(_me, nickname);
-            _network = message.Sender as Network;
+            _me.Network.Value = message.Sender as Network;
         }
 
-        private void HandleChannelModeIs(IReceiveMessage message)
+        private void HandleChannelModeIsReply(IReceiveMessage message)
         {
+            String[] split = message.Contents.Split(new[] { ' ' }, 3);
 
+            if(split.Length != 3)
+            {
+                _logger.Error("Channel mode reply with less than 3 parameters.");
+                return;
+            }
+
+            Channel channel = GetChannel(split[1]) as Channel;
+            channel.Modes.ParseAndApply(split[2]);
         }
 
-        private void HandleTopic(IReceiveMessage message)
+        private void HandleCreatedAtReply(IReceiveMessage message)
         {
+            String[] split = message.Contents.Split(new[] { ' ' }, 3);
 
+            if(split.Length != 3)
+            {
+                _logger.Error("Channel mode reply with less than 3 parameters.");
+                return;
+            }
+
+            Channel channel = GetChannel(split[1]) as Channel;
+            uint timestamp;
+            if(uint.TryParse(split[2], out timestamp))
+            {
+                channel.CreatedDate.Value = timestamp;
+            }
+        }
+
+        private void HandleTopicReply(IReceiveMessage message)
+        {
+            String[] split = message.Contents.Split(new[] { ' ' }, 3);
+
+            if(split.Length != 3)
+            {
+                _logger.Error("Topic reply with less than 3 parameters.");
+                return;
+            }
+
+            Channel channel = GetChannel(split[1]) as Channel;
+            channel.Topic.Value = split[2].Substring(1);
+        }
+
+        private void HandleTopicSetByReply(IReceiveMessage message)
+        {
+            String[] split = message.Contents.Split(new[] { ' ' }, 4);
+
+            if(split.Length != 4)
+            {
+                _logger.Error("Topic set by reply with less than 3 parameters.");
+                return;
+            }
+
+            Channel channel = GetChannel(split[1]) as Channel;
+            IIdentity identity = Identity.Parse(split[2]); // TODO: Search by identity and not nickname?
+            if(identity != null)
+            {
+                String nickname = null;
+                if(!String.IsNullOrWhiteSpace(identity.Name))
+                    nickname = identity.Name;
+                if(!String.IsNullOrWhiteSpace(identity.Host)) // For the case where it is a nickname, not an identity.
+                    nickname = identity.Host;
+                if(nickname != null)
+                {
+                    IUser user = GetUser(nickname);
+                    channel.TopicSetBy.Value = user;
+                }
+            }
+            uint timestamp;
+            if(uint.TryParse(split[3], out timestamp))
+            {
+                channel.TopicSetDate.Value = timestamp;
+            }
         }
 
         private void HandleNamesReply(IReceiveMessage message)
         {
+            String[] split = message.Contents.Split(new[] { ' ' }, 4);
 
+            if(split.Length != 4)
+            {
+                _logger.Error("Names reply with less than 4 parameters.");
+                return;
+            }
+
+            Channel channel = GetChannel(split[2]) as Channel;
+            String[] nicks = split[3].Substring(1).Split(' ');
+
+            foreach(String nick in nicks)
+            {
+                User user = GetUser(nick) as User;
+                ChannelUser channelUser = AddUserToChannel(user, channel);
+
+                char mode = ChannelUserMode.SymbolToMode(nick[0]);
+                if(mode != char.MinValue)
+                {
+                    channelUser.Modes.AddMode(mode);
+                }
+            }
         }
 
-        private void HandleAway(IReceiveMessage message)
+        private void HandleWhoReply(IReceiveMessage message)
+        {
+            String[] split = message.Contents.Split(new[] { ' ' }, 9);
+
+            if(split.Length != 9)
+            {
+                _logger.Error("Who reply with less than 9 parameters.");
+                return;
+            }
+
+            Channel channel = GetChannel(split[1]) as Channel;
+            User user = GetUser(split[5]) as User;
+            ChannelUser channelUser = channel.GetUser(user.Name) as ChannelUser;
+            user.Identity.Ident.Value = split[2];
+            user.Identity.Host.Value = split[3];
+            user.Network.Value = GetNetwork(split[4]);
+
+            bool away = false;
+            bool serverOp = false;
+            bool channelVoice = false;
+            bool channelOp = false;
+            
+            foreach(char c in split[6])
+            {
+                switch(c)
+                {
+                    case 'H': away = false; break;
+                    case 'G': away = true; break;
+                    case '*': serverOp = true; break;
+                    case '@': channelOp = true; break;
+                    case '+': channelVoice = true; break;
+                }
+            }
+
+            user.Away.Value = away;
+
+            // TODO: proper server operator mode.
+            if(serverOp)
+                user.Modes.AddMode('o');
+            else
+                user.Modes.RemoveMode('o');
+
+            if(channelVoice)
+                channelUser.Modes.AddMode('v');
+            else
+                channelUser.Modes.RemoveMode('v');
+
+            if(channelOp)
+                channelUser.Modes.AddMode('o');
+            else
+                channelUser.Modes.RemoveMode('o');
+
+            // TODO: hop count.
+
+            user.RealName.Value = split[8];
+        }
+
+        private void HandleAwayReply(IReceiveMessage message)
         {
 
         }
 
-        private void HandleUnAway(IReceiveMessage message)
+        private void HandleUnAwayReply(IReceiveMessage message)
         {
 
         }

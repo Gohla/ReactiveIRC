@@ -34,9 +34,24 @@ namespace ReactiveIRC.Interface
         Mode Modes { get; }
 
         /// <summary>
-        /// Gets the topic of the channel. Subscribe to receive changes.
+        /// Gets the topic of the channel. Initially set to empty string. Subscribe to receive changes.
         /// </summary>
         ObservableProperty<String> Topic { get; }
+
+        /// <summary>
+        /// Gets the user that set the topic. Initially set to null. Subscribe to receive changes.
+        /// </summary>
+        ObservableProperty<IUser> TopicSetBy { get; }
+
+        /// <summary>
+        /// Gets the date when this topic was set. Initially set to 0. Subscribe to receive changes.
+        /// </summary>
+        ObservableProperty<uint> TopicSetDate { get; }
+
+        /// <summary>
+        /// Gets the date at which the channel was created. Initially set to 0. Subscribe to receive changes.
+        /// </summary>
+        ObservableProperty<uint> CreatedDate { get; }
 
         /// <summary>
         /// Gets the channel user with given nickname.

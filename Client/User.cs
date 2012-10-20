@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using Gohla.Shared;
 using NLog;
 using ReactiveIRC.Interface;
+using ReactiveIRC.Protocol;
 
 namespace ReactiveIRC.Client
 {
@@ -20,6 +21,9 @@ namespace ReactiveIRC.Client
         public IObservable<ISendMessage> SentMessages { get; private set; }
 
         public IObservableCollection<IChannel> Channels { get { return _channels; } }
+        public IIdentity Identity { get; private set; }
+        public ObservableProperty<String> RealName { get; private set; }
+        public ObservableProperty<INetwork> Network { get; private set; }
         public Mode Modes { get; private set; }
         public ObservableProperty<bool> Away { get { return _away; } }
 
@@ -32,6 +36,9 @@ namespace ReactiveIRC.Client
         public User(IClientConnection connection, String name)
         {
             Connection = connection;
+            Identity = new Identity(name, null, null);
+            RealName = new ObservableProperty<String>(String.Empty);
+            Network = new ObservableProperty<INetwork>(null);
             Modes = new Mode();
             _name = new ObservableProperty<String>(name);
 
@@ -49,11 +56,7 @@ namespace ReactiveIRC.Client
         internal void AddChannel(IChannel channel)
         {
             if(_channels.Contains(channel.Name))
-            {
-                _logger.Error("Trying to add channel " + channel.Name + " to user " + Name +
-                    ", but user is already in this channel.");
                 return;
-            }
 
             _channels.Add(channel);
         }
