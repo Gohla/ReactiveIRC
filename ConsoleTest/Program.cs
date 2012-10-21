@@ -3,7 +3,6 @@ using System.Threading;
 using NLog;
 using ReactiveIRC.Client;
 using ReactiveIRC.Interface;
-using Gohla.Shared;
 
 namespace ReactiveIRC.ConsoleTest
 {
@@ -14,7 +13,8 @@ namespace ReactiveIRC.ConsoleTest
         public static void Main(String[] args)
         {
             bool run = true;
-            IRCClientConnection connection = new IRCClientConnection(args[0], Convert.ToUInt16(args[1]));
+            IRCClientConnection connection = new IRCClientConnection(args[0], Convert.ToUInt16(args[1]), 
+                new ImplicitSynchronisationContext());
             connection.ReceivedMessages.Subscribe(PrintMessage);
             connection.Connect().Subscribe(
                 _ => {},
@@ -40,4 +40,39 @@ namespace ReactiveIRC.ConsoleTest
                 message.Sender.ToString() + " :: " + message.Receiver + " :: " + message.Contents);
         }
     }
+
+    public class ImplicitSynchronisationContext : SynchronizationContext
+    {
+        private readonly SynchronizationContext m_SyncContext;
+
+        public ImplicitSynchronisationContext()
+        {
+            m_SyncContext = SynchronizationContext.Current;
+        }
+
+        public override void Post(SendOrPostCallback d, object state)
+        {
+            if(m_SyncContext != null)
+            {
+                m_SyncContext.Post(d, state);
+            }
+            else
+            {
+                ThreadPool.QueueUserWorkItem(_ => d(state));
+            }
+        }
+
+        public override void Send(SendOrPostCallback d, object state)
+        {
+            if(m_SyncContext != null)
+            {
+                m_SyncContext.Send(d, state);
+            }
+            else
+            {
+                d(state);
+            }
+        }
+    }
+
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using System.Threading;
 using Gohla.Shared;
 using NLog;
 using ReactiveIRC.Interface;
@@ -12,7 +13,8 @@ namespace ReactiveIRC.Client
     {
         protected static readonly Logger _logger = NLog.LogManager.GetLogger("User");
 
-        private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
+        private SynchronizationContext _context;
+        private SynchronizedKeyedCollection<String, IChannel> _channels;
 
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
         public IObservable<IReceiveMessage> SentMessages { get; private set; }
@@ -30,8 +32,11 @@ namespace ReactiveIRC.Client
 
         public String Key { get { return Name; } }
 
-        public User(IClientConnection connection, String name)
+        public User(IClientConnection connection, String name, SynchronizationContext context)
         {
+            _context = context;
+            _channels = new SynchronizedKeyedCollection<String, IChannel>(_context);
+
             Connection = connection;
             Identity = new Identity(name, null, null);
             RealName = new ObservableProperty<String>(String.Empty);

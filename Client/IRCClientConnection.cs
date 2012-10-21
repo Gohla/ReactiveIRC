@@ -9,6 +9,7 @@ using Gohla.Shared;
 using NLog;
 using ReactiveIRC.Interface;
 using ReactiveIRC.Protocol;
+using System.Threading;
 
 namespace ReactiveIRC.Client
 {
@@ -17,12 +18,13 @@ namespace ReactiveIRC.Client
         protected static readonly Logger _logger = NLog.LogManager.GetLogger("IRCClientConnection");
         protected static readonly String _initialNickname = "***initial***";
 
+        private SynchronizationContext _context;
         private MessageSender _messageSender;
         private MessageReceiver _messageReceiver;
         private User _me;
-        private KeyedCollection<String, INetwork> _networks = new KeyedCollection<String, INetwork>();
-        private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
-        private KeyedCollection<String, IUser> _users = new KeyedCollection<String, IUser>();
+        private SynchronizedKeyedCollection<String, INetwork> _networks;
+        private SynchronizedKeyedCollection<String, IChannel> _channels;
+        private SynchronizedKeyedCollection<String, IUser> _users;
         private Subject<IMessage> _messages = new Subject<IMessage>();
         private Subject<IReceiveMessage> _receivedMessages = new Subject<IReceiveMessage>();
         private Subject<ISendMessage> _sentMessages = new Subject<ISendMessage>();
@@ -37,9 +39,14 @@ namespace ReactiveIRC.Client
         public IObservable<ISendMessage> SentMessages { get { return _sentMessages; } }
         public IMessageSender MessageSender { get { return _messageSender; } }
 
-        public IRCClientConnection(String address, ushort port)
+        public IRCClientConnection(String address, ushort port, SynchronizationContext context)
             : base(address, port)
         {
+            _context = context;
+            _networks = new SynchronizedKeyedCollection<String, INetwork>(_context);
+            _channels = new SynchronizedKeyedCollection<String, IChannel>(_context);
+            _users = new SynchronizedKeyedCollection<String, IUser>(_context);
+
             _me = GetUser(_initialNickname) as User;
 
             _messageSender = new MessageSender(this);
@@ -218,7 +225,7 @@ namespace ReactiveIRC.Client
             if(_channels.Contains(channelName))
                 return _channels[channelName];
 
-            Channel channel = new Channel(this, channelName);
+            Channel channel = new Channel(this, channelName, _context);
             _channels.Add(channel);
             return channel;
         }
@@ -228,7 +235,7 @@ namespace ReactiveIRC.Client
             if(_users.Contains(nickname))
                 return _users[nickname];
 
-            User user = new User(this, nickname);
+            User user = new User(this, nickname, _context);
             _users.Add(user);
             return user;
         }
