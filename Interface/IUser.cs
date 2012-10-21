@@ -9,14 +9,14 @@ namespace ReactiveIRC.Interface
     public interface IUser : IMessageTarget, IDisposable, IKeyedObject<String>, IComparable<IUser>, IEquatable<IUser>
     {
         /// <summary>
-        /// Gets an observable stream of received messages for this user from the server.
+        /// Gets an observable stream of messages received by this user.
         /// </summary>
         IObservable<IReceiveMessage> ReceivedMessages { get; }
 
         /// <summary>
-        /// Gets an observable stream of all sent messages for this user by the client.
+        /// Gets an observable stream of messages sent by this user.
         /// </summary>
-        IObservable<ISendMessage> SentMessages { get; }
+        IObservable<IReceiveMessage> SentMessages { get; }
 
         /// <summary>
         /// Gets the channels this user has joined.

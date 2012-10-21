@@ -14,7 +14,6 @@ namespace ReactiveIRC.Client
         private KeyedCollection<String, IChannelUser> _users = new KeyedCollection<String, IChannelUser>();
 
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
-        public IObservable<ISendMessage> SentMessages { get; private set; }
 
         public IObservableCollection<IChannelUser> Users { get { return _users; } }
         public Mode Modes { get; private set; }
@@ -42,9 +41,6 @@ namespace ReactiveIRC.Client
             ReceivedMessages = connection.ReceivedMessages
                 .Where(m => m.Receiver.Equals(this))
                 ;
-            SentMessages = connection.SentMessages
-                .Where(m => m.Receivers.Contains(this))
-                ;
         }
 
         public void Dispose()
@@ -70,9 +66,14 @@ namespace ReactiveIRC.Client
             _users = null;
         }
 
+        public bool ContainsUser(String nickname)
+        {
+            return _users.Contains(nickname);
+        }
+
         public IChannelUser GetUser(String nickname)
         {
-            if(_users.Contains(nickname))
+            if(ContainsUser(nickname))
                 return _users[nickname];
 
             IUser user = Connection.GetUser(nickname);

@@ -10,14 +10,9 @@ namespace ReactiveIRC.Interface
         IEquatable<IChannel>
     {
         /// <summary>
-        /// Gets an observable stream of received messages for this channel from the server.
+        /// Gets an observable stream of messages received by this channel.
         /// </summary>
         IObservable<IReceiveMessage> ReceivedMessages { get; }
-
-        /// <summary>
-        /// Gets an observable stream of all sent messages for this channel by the client.
-        /// </summary>
-        IObservable<ISendMessage> SentMessages { get; }
 
         /// <summary>
         /// Gets the users in this channel.
@@ -53,5 +48,16 @@ namespace ReactiveIRC.Interface
         /// Gets the channel user with given nickname.
         /// </summary>
         IChannelUser GetUser(String nickname);
+
+        /// <summary>
+        /// Query if the channel contains the user with given nickname.
+        /// </summary>
+        ///
+        /// <param name="nickname">The nickname.</param>
+        ///
+        /// <returns>
+        /// True if channel contains the user, false if not.
+        /// </returns>
+        bool ContainsUser(String nickname);
     }
 }

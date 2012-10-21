@@ -15,7 +15,7 @@ namespace ReactiveIRC.Client
         private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
 
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
-        public IObservable<ISendMessage> SentMessages { get; private set; }
+        public IObservable<IReceiveMessage> SentMessages { get; private set; }
 
         public IObservableCollection<IChannel> Channels { get { return _channels; } }
         public IIdentity Identity { get; private set; }
@@ -43,8 +43,8 @@ namespace ReactiveIRC.Client
             ReceivedMessages = connection.ReceivedMessages
                 .Where(m => m.Receiver.Equals(this))
                 ;
-            SentMessages = connection.SentMessages
-                .Where(m => m.Receivers.Contains(this))
+            SentMessages = connection.ReceivedMessages
+                .Where(m => m.Sender.Equals(this))
                 ;
         }
 
