@@ -115,7 +115,7 @@ namespace ReactiveIRC.Interface
         public static void Kick(this IChannelUser channelUser)
         {
             IClientConnection connection = channelUser.Connection;
-            connection.Send(connection.MessageSender.Kick(channelUser));
+            connection.SendAndForget(connection.MessageSender.Kick(channelUser));
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace ReactiveIRC.Interface
         public static void Kick(this IChannelUser channelUser, String reason)
         {
             IClientConnection connection = channelUser.Connection;
-            connection.Send(connection.MessageSender.Kick(channelUser, reason));
+            connection.SendAndForget(connection.MessageSender.Kick(channelUser, reason));
         }
 
         public static void Voice(this IChannelUser channelUser)

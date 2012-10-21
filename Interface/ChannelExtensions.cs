@@ -13,7 +13,7 @@ namespace ReactiveIRC.Interface
         public static void SendMessage(this IChannel channel, String message)
         {
             IClientConnection connection = channel.Connection;
-            connection.Send(connection.MessageSender.Message(channel, message));
+            connection.SendAndForget(connection.MessageSender.Message(channel, message));
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace ReactiveIRC.Interface
         public static void SendAction(this IChannel channel, String action)
         {
             IClientConnection connection = channel.Connection;
-            connection.Send(connection.MessageSender.Action(channel, action));
+            connection.SendAndForget(connection.MessageSender.Action(channel, action));
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace ReactiveIRC.Interface
         public static void SendNotice(this IChannel channel, String notice)
         {
             IClientConnection connection = channel.Connection;
-            connection.Send(connection.MessageSender.Notice(channel, notice));
+            connection.SendAndForget(connection.MessageSender.Notice(channel, notice));
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace ReactiveIRC.Interface
         public static void SetTopic(this IChannel channel, String topic)
         {
             IClientConnection connection = channel.Connection;
-            connection.Send(connection.MessageSender.Topic(channel, topic));
+            connection.SendAndForget(connection.MessageSender.Topic(channel, topic));
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace ReactiveIRC.Interface
         public static void ClearTopic(this IChannel channel)
         {
             IClientConnection connection = channel.Connection;
-            connection.Send(connection.MessageSender.Topic(channel));
+            connection.SendAndForget(connection.MessageSender.Topic(channel));
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace ReactiveIRC.Interface
         public static void SetMode(this IChannel channel, String mode)
         {
             IClientConnection connection = channel.Connection;
-            connection.Send(connection.MessageSender.Mode(channel, mode));
+            connection.SendAndForget(connection.MessageSender.Mode(channel, mode));
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace ReactiveIRC.Interface
         public static void SetUserMode(this IChannel channel, String userName, String mode)
         {
             IClientConnection connection = channel.Connection;
-            connection.Send(connection.MessageSender.Mode(channel, mode, userName));
+            connection.SendAndForget(connection.MessageSender.Mode(channel, mode, userName));
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace ReactiveIRC.Interface
         {
             IClientConnection connection = channel.Connection;
             IChannelUser channelUser = channel.GetUser(userName);
-            connection.Send(connection.MessageSender.Kick(channelUser));
+            connection.SendAndForget(connection.MessageSender.Kick(channelUser));
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace ReactiveIRC.Interface
         {
             IClientConnection connection = channel.Connection;
             IChannelUser channelUser = channel.GetUser(user.Name);
-            connection.Send(connection.MessageSender.Kick(channelUser));
+            connection.SendAndForget(connection.MessageSender.Kick(channelUser));
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace ReactiveIRC.Interface
         {
             IClientConnection connection = channel.Connection;
             IChannelUser channelUser = channel.GetUser(userName);
-            connection.Send(connection.MessageSender.Kick(channelUser, reason));
+            connection.SendAndForget(connection.MessageSender.Kick(channelUser, reason));
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace ReactiveIRC.Interface
         {
             IClientConnection connection = channel.Connection;
             IChannelUser channelUser = channel.GetUser(user.Name);
-            connection.Send(connection.MessageSender.Kick(channelUser, reason));
+            connection.SendAndForget(connection.MessageSender.Kick(channelUser, reason));
         }
     }
 }

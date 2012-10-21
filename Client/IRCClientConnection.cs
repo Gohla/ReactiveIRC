@@ -476,13 +476,17 @@ namespace ReactiveIRC.Client
 
             foreach(String nick in nicks)
             {
-                User user = GetUser(nick) as User;
-                ChannelUser channelUser = AddUserToChannel(user, channel);
-
                 char mode = ChannelUserMode.SymbolToMode(nick[0]);
                 if(mode != char.MinValue)
                 {
+                    User user = GetUser(nick.Substring(1)) as User;
+                    ChannelUser channelUser = AddUserToChannel(user, channel);
                     channelUser.Modes.AddMode(mode);
+                }
+                else
+                {
+                    User user = GetUser(nick) as User;
+                    ChannelUser channelUser = AddUserToChannel(user, channel);
                 }
             }
         }

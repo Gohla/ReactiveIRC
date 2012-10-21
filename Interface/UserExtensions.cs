@@ -13,7 +13,7 @@ namespace ReactiveIRC.Interface
         public static void SendMessage(this IUser user, String message)
         {
             IClientConnection connection = user.Connection;
-            connection.Send(connection.MessageSender.Message(user, message));
+            connection.SendAndForget(connection.MessageSender.Message(user, message));
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace ReactiveIRC.Interface
         public static void SendAction(this IUser user, String action)
         {
             IClientConnection connection = user.Connection;
-            connection.Send(connection.MessageSender.Action(user, action));
+            connection.SendAndForget(connection.MessageSender.Action(user, action));
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace ReactiveIRC.Interface
         public static void SendNotice(this IUser user, String notice)
         {
             IClientConnection connection = user.Connection;
-            connection.Send(connection.MessageSender.Notice(user, notice));
+            connection.SendAndForget(connection.MessageSender.Notice(user, notice));
         }
     }
 }
