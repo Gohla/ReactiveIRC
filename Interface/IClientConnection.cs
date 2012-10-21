@@ -78,11 +78,23 @@ namespace ReactiveIRC.Interface
         IObservable<Unit> Disconnect();
 
         /// <summary>
+        /// Send given messages to the server. Returns an observable that must be subscribed to to actually send the
+        /// message.
+        /// </summary>
+        ///
+        /// <param name="messages">The messages to send.</param>
+        ///
+        /// <returns>
+        /// An observable stream that notifies when message is sent or has failed to send.
+        /// </returns>
+        IObservable<Unit> Send(params ISendMessage[] messages);
+
+        /// <summary>
         /// Send given messages to the server.
         /// </summary>
         ///
-        /// <param name="messages">An observable stream that notifies when message is sent or has failed to send.</param>
-        IObservable<Unit> Send(params ISendMessage[] messages);
+        /// <param name="messages">The messages to send.</param>
+        void SendAndForget(params ISendMessage[] messages);
 
         /// <summary>
         /// Logins in on the IRC server.

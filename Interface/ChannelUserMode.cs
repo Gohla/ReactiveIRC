@@ -1,8 +1,6 @@
 ﻿using System;
-using ReactiveIRC.Interface;
-using System.Linq;
 
-namespace ReactiveIRC.Protocol
+namespace ReactiveIRC.Interface
 {
     [Flags]
     public enum ChannelUserModeType

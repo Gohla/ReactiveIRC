@@ -1,0 +1,144 @@
+﻿using System;
+
+namespace ReactiveIRC.Interface
+{
+    public static class ChannelExtensions
+    {
+        /// <summary>
+        /// Sends a message to this channel.
+        /// </summary>
+        ///
+        /// <param name="channel">The channel to act on.</param>
+        /// <param name="message">The message.</param>
+        public static void SendMessage(this IChannel channel, String message)
+        {
+            IClientConnection connection = channel.Connection;
+            connection.Send(connection.MessageSender.Message(channel, message));
+        }
+
+        /// <summary>
+        /// Sends an action to this channel.
+        /// </summary>
+        ///
+        /// <param name="channel">The channel to act on.</param>
+        /// <param name="action"> The action.</param>
+        public static void SendAction(this IChannel channel, String action)
+        {
+            IClientConnection connection = channel.Connection;
+            connection.Send(connection.MessageSender.Action(channel, action));
+        }
+
+        /// <summary>
+        /// Sends a notice to this channel.
+        /// </summary>
+        ///
+        /// <param name="channel">The channel to act on.</param>
+        /// <param name="notice"> The notice.</param>
+        public static void SendNotice(this IChannel channel, String notice)
+        {
+            IClientConnection connection = channel.Connection;
+            connection.Send(connection.MessageSender.Notice(channel, notice));
+        }
+
+        /// <summary>
+        /// Sets the topic for this channel.
+        /// </summary>
+        ///
+        /// <param name="channel">The channel to act on.</param>
+        /// <param name="topic">  The topic.</param>
+        public static void SetTopic(this IChannel channel, String topic)
+        {
+            IClientConnection connection = channel.Connection;
+            connection.Send(connection.MessageSender.Topic(channel, topic));
+        }
+
+        /// <summary>
+        /// Clears the topic for this channel.
+        /// </summary>
+        ///
+        /// <param name="channel">The channel to act on.</param>
+        public static void ClearTopic(this IChannel channel)
+        {
+            IClientConnection connection = channel.Connection;
+            connection.Send(connection.MessageSender.Topic(channel));
+        }
+
+        /// <summary>
+        /// Sets a new mode for this channel.
+        /// </summary>
+        ///
+        /// <param name="channel">The channel to act on.</param>
+        /// <param name="mode">   The mode.</param>
+        public static void SetMode(this IChannel channel, String mode)
+        {
+            IClientConnection connection = channel.Connection;
+            connection.Send(connection.MessageSender.Mode(channel, mode));
+        }
+
+        /// <summary>
+        /// Sets a new mode for a user on this channel.
+        /// </summary>
+        ///
+        /// <param name="channel">The channel to act on.</param>
+        /// <param name="mode">   The mode.</param>
+        public static void SetUserMode(this IChannel channel, String userName, String mode)
+        {
+            IClientConnection connection = channel.Connection;
+            connection.Send(connection.MessageSender.Mode(channel, mode, userName));
+        }
+
+        /// <summary>
+        /// Kicks a user with given name from this channel.
+        /// </summary>
+        ///
+        /// <param name="channel"> The channel to act on.</param>
+        /// <param name="userName">Name of the user.</param>
+        public static void Kick(this IChannel channel, String userName)
+        {
+            IClientConnection connection = channel.Connection;
+            IChannelUser channelUser = channel.GetUser(userName);
+            connection.Send(connection.MessageSender.Kick(channelUser));
+        }
+
+        /// <summary>
+        /// Kicks a user with given user from this channel.
+        /// </summary>
+        ///
+        /// <param name="channel">The channel to act on.</param>
+        /// <param name="user">   The user.</param>
+        public static void Kick(this IChannel channel, IUser user)
+        {
+            IClientConnection connection = channel.Connection;
+            IChannelUser channelUser = channel.GetUser(user.Name);
+            connection.Send(connection.MessageSender.Kick(channelUser));
+        }
+
+        /// <summary>
+        /// Kicks a user with given user name from this channel with a reason.
+        /// </summary>
+        ///
+        /// <param name="channel"> The channel to act on.</param>
+        /// <param name="userName">Name of the user.</param>
+        /// <param name="reason">  The reason.</param>
+        public static void Kick(this IChannel channel, String userName, String reason)
+        {
+            IClientConnection connection = channel.Connection;
+            IChannelUser channelUser = channel.GetUser(userName);
+            connection.Send(connection.MessageSender.Kick(channelUser, reason));
+        }
+
+        /// <summary>
+        /// Kicks a user with given user from this channel with a reason.
+        /// </summary>
+        ///
+        /// <param name="channel">The channel to act on.</param>
+        /// <param name="user">   The user.</param>
+        /// <param name="reason"> The reason.</param>
+        public static void Kick(this IChannel channel, IUser user, String reason)
+        {
+            IClientConnection connection = channel.Connection;
+            IChannelUser channelUser = channel.GetUser(user.Name);
+            connection.Send(connection.MessageSender.Kick(channelUser, reason));
+        }
+    }
+}

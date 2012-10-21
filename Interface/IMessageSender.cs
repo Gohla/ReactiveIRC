@@ -4,6 +4,7 @@ namespace ReactiveIRC.Interface
 {
     public interface IMessageSender
     {
+        ISendMessage Action(IMessageTarget receiver, String message);
         ISendMessage Admin();
         ISendMessage Admin(String target);
         ISendMessage Away();
@@ -37,9 +38,10 @@ namespace ReactiveIRC.Interface
         ISendMessage Lusers();
         ISendMessage Lusers(String mask);
         ISendMessage Lusers(String mask, String target);
-        ISendMessage Mode(String target);
-        ISendMessage Mode(String target, String newmode);
-        ISendMessage Mode(String target, String[] newModes, String[] newModeParameters);
+        ISendMessage Mode(IMessageTarget target);
+        ISendMessage Mode(IMessageTarget target, String newmode);
+        ISendMessage Mode(IMessageTarget target, String newmode, String newModeParameter);
+        ISendMessage Mode(IMessageTarget target, String[] newModes, String[] newModeParameters);
         ISendMessage Motd();
         ISendMessage Motd(String target);
         ISendMessage Names();
@@ -59,7 +61,7 @@ namespace ReactiveIRC.Interface
         ISendMessage Ping(String server, String server2);
         ISendMessage Pong(String server);
         ISendMessage Pong(String server, String server2);
-        ISendMessage Privmsg(IMessageTarget receiver, String message);
+        ISendMessage Message(IMessageTarget receiver, String message);
         ISendMessage Quit();
         ISendMessage Quit(String quitmessage);
         ISendMessage Rehash();

@@ -12,6 +12,9 @@ namespace ReactiveIRC.Interface
 
     public class Mode : IDisposable
     {
+        public const char AddChar = '+';
+        public const char RemoveChar = '-';
+
         public ObservableHashSet<char> Modes { get; private set; }
         public ObservableProperty<String> ModesString { get; private set; }
 
@@ -36,13 +39,13 @@ namespace ReactiveIRC.Interface
         public void AddMode(char mode)
         {
             Modes.Add(mode);
-            ModesString.Value = "+" + Modes.ToString();
+            ModesString.Value = AddChar + Modes.ToString();
         }
 
         public void RemoveMode(char mode)
         {
             Modes.Remove(mode);
-            ModesString.Value = "+" + Modes.ToString();
+            ModesString.Value = AddChar + Modes.ToString();
         }
 
         public void Apply(ModeChange change)
@@ -72,10 +75,10 @@ namespace ReactiveIRC.Interface
             {
                 switch(c)
                 {
-                    case '+':
+                    case AddChar:
                         add = true;
                         break;
-                    case '-':
+                    case RemoveChar:
                         add = false;
                         break;
                     default:

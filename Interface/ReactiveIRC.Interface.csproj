@@ -55,6 +55,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChannelExtensions.cs" />
+    <Compile Include="ChannelUserExtensions.cs" />
+    <Compile Include="ChannelUserMode.cs" />
+    <Compile Include="ClientConnectionExtensions.cs" />
     <Compile Include="IChannel.cs" />
     <Compile Include="IChannelUser.cs" />
     <Compile Include="IClientConnection.cs" />
@@ -71,6 +75,7 @@
     <Compile Include="ReceiveType.cs" />
     <Compile Include="ReplyType.cs" />
     <Compile Include="SendType.cs" />
+    <Compile Include="UserExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

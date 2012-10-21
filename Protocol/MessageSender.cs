@@ -36,10 +36,15 @@ namespace ReactiveIRC.Protocol
             return new SendMessage(Connection, "OPER " + name + " " + password, SendType.Oper);
         }
 
-        public ISendMessage Privmsg(IMessageTarget receiver, String message)
+        public ISendMessage Message(IMessageTarget receiver, String message)
         {
             return new SendMessage(Connection, "PRIVMSG " + receiver.Name + " :" + message, 
                 SendType.Privmsg, receiver);
+        }
+
+        public ISendMessage Action(IMessageTarget receiver, String action)
+        {
+            return Message(receiver, '\x001' + "ACTION" + action + '\x001');
         }
 
         public ISendMessage Notice(IMessageTarget receiver, String message)
@@ -354,17 +359,23 @@ namespace ReactiveIRC.Protocol
                 SendType.Topic, channel);
         }
 
-        public ISendMessage Mode(String target)
+        public ISendMessage Mode(IMessageTarget target)
         {
-            return new SendMessage(Connection, "MODE " + target, SendType.Mode);
+            return new SendMessage(Connection, "MODE " + target.Name, SendType.Mode, target);
         }
 
-        public ISendMessage Mode(String target, String newmode)
+        public ISendMessage Mode(IMessageTarget target, String newmode)
         {
-            return new SendMessage(Connection, "MODE " + target + " " + newmode, SendType.Mode);
+            return new SendMessage(Connection, "MODE " + target.Name + " " + newmode, SendType.Mode, target);
         }
 
-        public ISendMessage Mode(String target, String[] newModes, String[] newModeParameters)
+        public ISendMessage Mode(IMessageTarget target, String newmode, String newModeParameter)
+        {
+            return new SendMessage(Connection, "MODE " + target.Name + " " + newmode + " " + newModeParameter, 
+                SendType.Mode, target);
+        }
+
+        public ISendMessage Mode(IMessageTarget target, String[] newModes, String[] newModeParameters)
         {
             if(newModes == null)
             {

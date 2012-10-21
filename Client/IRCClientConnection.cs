@@ -298,7 +298,7 @@ namespace ReactiveIRC.Client
             if(_me.Equals(user))
             {
                 SendAndForget(
-                    _messageSender.Mode(channel.Name)
+                    _messageSender.Mode(channel)
                   , _messageSender.Who(channel.Name)
                 );
             }
