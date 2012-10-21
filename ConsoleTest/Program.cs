@@ -37,7 +37,7 @@ namespace ReactiveIRC.ConsoleTest
         private static void PrintMessage(IReceiveMessage message)
         {
             _logger.Info(message.Type.ToString() + "," + message.ReplyType.ToString() + " - " + 
-                message.Sender.ToString() + " :: " + message.Receivers.ToString(", ") + " :: " + message.Contents);
+                message.Sender.ToString() + " :: " + message.Receiver + " :: " + message.Contents);
         }
     }
 }

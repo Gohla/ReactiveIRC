@@ -159,7 +159,7 @@ namespace ReactiveIRC.Client
 
             return Observable.Merge(
                 messages
-                    .Select(m => WriteRaw(m.Raw))
+                    .Select(m => WriteRaw(m.Contents))
             );
         }
 
@@ -169,7 +169,7 @@ namespace ReactiveIRC.Client
 
             _disposables.Add(Observable.Merge(
                 messages
-                    .Select(m => WriteRaw(m.Raw))
+                    .Select(m => WriteRaw(m.Contents))
             ).Subscribe());
         }
 
@@ -290,14 +290,8 @@ namespace ReactiveIRC.Client
 
         private void HandleJoin(IReceiveMessage message)
         {
-            if(message.Receivers.Count != 1)
-            {
-                _logger.Error("Join message with no or more than one receiver.");
-                return;
-            }
-
             User user = message.Sender as User;
-            Channel channel = message.Receivers.First() as Channel;
+            Channel channel = message.Receiver as Channel;
             AddUserToChannel(user, channel);
 
             if(_me.Equals(user))
@@ -315,26 +309,14 @@ namespace ReactiveIRC.Client
 
         private void HandlePart(IReceiveMessage message)
         {
-            if(message.Receivers.Count != 1)
-            {
-                _logger.Error("Part message with no or more than one receiver.");
-                return;
-            }
-
             User user = message.Sender as User;
-            Channel channel = message.Receivers.First() as Channel;
+            Channel channel = message.Receiver as Channel;
             RemoveUserFromChannel(user, channel);
         }
 
         private void HandleKick(IReceiveMessage message)
         {
-            if(message.Receivers.Count != 1)
-            {
-                _logger.Error("Kick message with no or more than one receiver.");
-                return;
-            }
-
-            ChannelUser channelUser = message.Receivers.First() as ChannelUser;
+            ChannelUser channelUser = message.Receiver as ChannelUser;
             RemoveUserFromChannel(channelUser);
         }
 
@@ -348,25 +330,13 @@ namespace ReactiveIRC.Client
 
         private void HandleTopicChange(IReceiveMessage message)
         {
-            if(message.Receivers.Count != 1)
-            {
-                _logger.Error("Topic change message with no or more than one receiver.");
-                return;
-            }
-
-            Channel channel = message.Receivers.First() as Channel;
+            Channel channel = message.Receiver as Channel;
             channel.Topic.Value = message.Contents;
         }
 
         private void HandleChannelModeChange(IReceiveMessage message)
         {
-            if(message.Receivers.Count != 1)
-            {
-                _logger.Error("Channel mode change message with no or more than one receiver.");
-                return;
-            }
-
-            Channel channel = message.Receivers.First() as Channel;
+            Channel channel = message.Receiver as Channel;
 
             String[] split = message.Contents.Split(new[] { ' ' }, 2);
             if(split.Length == 1)
@@ -394,13 +364,7 @@ namespace ReactiveIRC.Client
 
         private void HandleUserModeChange(IReceiveMessage message)
         {
-            if(message.Receivers.Count != 1)
-            {
-                _logger.Error("User mode change message with no or more than one receiver.");
-                return;
-            }
-
-            User user = message.Receivers.First() as User;
+            User user = message.Receiver as User;
             user.Modes.ParseAndApply(message.Contents);
         }
 

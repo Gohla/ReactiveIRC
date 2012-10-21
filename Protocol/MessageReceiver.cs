@@ -140,7 +140,7 @@ namespace ReactiveIRC.Protocol
         private ReceiveMessage ParseInformationMessage(IMessageTarget sender, ReceiveType type, ReplyType replyType, 
             String parameters)
         {
-            return new ReceiveMessage(Connection, parameters, sender, type, replyType, Connection.Me);
+            return new ReceiveMessage(Connection, parameters, sender, Connection.Me, type, replyType);
         }
 
         private ReceiveMessage ParseMessage(IMessageTarget sender, String line)
@@ -174,7 +174,8 @@ namespace ReactiveIRC.Protocol
             message = ParseInviteMessage(sender, line);
             if(message != null) return message;
 
-            return new ReceiveMessage(Connection, line, sender, ReceiveType.Unknown, ReplyType.Unknown);
+            return new ReceiveMessage(Connection, line, sender, Connection.Me.Network.Value, ReceiveType.Unknown, 
+                ReplyType.Unknown);
         }
 
         private ReceiveMessage ParseUndirectedMessage(Regex regex, ReceiveType type, IMessageTarget sender, String line,
@@ -187,8 +188,7 @@ namespace ReactiveIRC.Protocol
                 if(results.Groups[1].Success)
                     message = results.Groups[1].Value;
 
-                return new ReceiveMessage(Connection, message, sender, type, ReplyType.Unknown,
-                    receiver);
+                return new ReceiveMessage(Connection, message, sender, receiver, type, ReplyType.Unknown);
             }
             return null;
         }
@@ -204,7 +204,7 @@ namespace ReactiveIRC.Protocol
                 if(results.Groups[2].Success)
                     message = results.Groups[2].Value;
 
-                return new ReceiveMessage(Connection, message, sender, type, ReplyType.Unknown, receiver);
+                return new ReceiveMessage(Connection, message, sender, receiver, type, ReplyType.Unknown);
             }
             return null;
         }
@@ -222,8 +222,7 @@ namespace ReactiveIRC.Protocol
                 IChannel channel = Connection.GetChannel(channelName);
                 IChannelUser channelUser = channel.GetUser(userName);
 
-                return new ReceiveMessage(Connection, message, sender, ReceiveType.Kick, ReplyType.Unknown, 
-                    channelUser);
+                return new ReceiveMessage(Connection, message, sender, channelUser, ReceiveType.Kick, ReplyType.Unknown);
             }
             return null;
         }
@@ -241,7 +240,7 @@ namespace ReactiveIRC.Protocol
 
                 ReceiveType type = receiver.Type == MessageTargetType.Channel ? ReceiveType.ChannelModeChange : 
                     ReceiveType.UserModeChange;
-                return new ReceiveMessage(Connection, message, sender, type, ReplyType.Unknown, receiver);
+                return new ReceiveMessage(Connection, message, sender, receiver, type, ReplyType.Unknown);
             }
             return null;
         }
@@ -255,7 +254,7 @@ namespace ReactiveIRC.Protocol
                 String channelName = results.Groups[2].Value;
                 IChannel channel = Connection.GetChannel(channelName);
 
-                return new ReceiveMessage(Connection, userName, sender, ReceiveType.Invite, ReplyType.Unknown, channel);
+                return new ReceiveMessage(Connection, userName, sender, channel, ReceiveType.Invite, ReplyType.Unknown);
             }
             return null;
         }

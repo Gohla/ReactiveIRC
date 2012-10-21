@@ -13,7 +13,6 @@ namespace ReactiveIRC.Client
 
         private KeyedCollection<String, IChannelUser> _users = new KeyedCollection<String, IChannelUser>();
 
-        public IObservable<IMessage> Messages { get; private set; }
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
         public IObservable<ISendMessage> SentMessages { get; private set; }
 
@@ -40,11 +39,8 @@ namespace ReactiveIRC.Client
             TopicSetDate = new ObservableProperty<uint>(0);
             CreatedDate = new ObservableProperty<uint>(0);
 
-            Messages = connection.Messages
-                .Where(m => m.Receivers.Contains(this))
-                ;
             ReceivedMessages = connection.ReceivedMessages
-                .Where(m => m.Receivers.Contains(this))
+                .Where(m => m.Receiver.Equals(this))
                 ;
             SentMessages = connection.SentMessages
                 .Where(m => m.Receivers.Contains(this))

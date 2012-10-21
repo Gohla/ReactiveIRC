@@ -21,11 +21,5 @@
       , NickChange          // {IUser}                          -> {INetwork}. 
       , UserModeChange      // {IUser, INetwork}                -> {IUser}
       , ChannelModeChange   // {IChannelUser, IUser, INetwork}  -> {IChannel}
-      , Voice               // {IChannelUser, IUser, INetwork}  -> {IChannelUser}
-      , DeVoice             // {IChannelUser, IUser, INetwork}  -> {IChannelUser}
-      , HalfOp              // {IChannelUser, IUser, INetwork}  -> {IChannelUser}
-      , DeHalfOp            // {IChannelUser, IUser, INetwork}  -> {IChannelUser}
-      , Op                  // {IChannelUser, IUser, INetwork}  -> {IChannelUser}
-      , DeOp                // {IChannelUser, IUser, INetwork}  -> {IChannelUser}
     }
 }

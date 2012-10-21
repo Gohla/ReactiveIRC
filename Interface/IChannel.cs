@@ -10,11 +10,6 @@ namespace ReactiveIRC.Interface
         IEquatable<IChannel>
     {
         /// <summary>
-        /// Gets an observable stream of received and sent messages for this channel.
-        /// </summary>
-        IObservable<IMessage> Messages { get; }
-
-        /// <summary>
         /// Gets an observable stream of received messages for this channel from the server.
         /// </summary>
         IObservable<IReceiveMessage> ReceivedMessages { get; }

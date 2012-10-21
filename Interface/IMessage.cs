@@ -14,8 +14,8 @@ namespace ReactiveIRC.Interface
         IClientConnection Connection { get; }
 
         /// <summary>
-        /// Gets the receivers of the message. If empty, receiver is global.
+        /// Gets the contents of the message.
         /// </summary>
-        ICollection<IMessageTarget> Receivers { get; }
+        String Contents { get; }
     }
 }

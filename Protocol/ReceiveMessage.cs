@@ -3,19 +3,22 @@ using ReactiveIRC.Interface;
 
 namespace ReactiveIRC.Protocol
 {
-    public class ReceiveMessage : Message, IReceiveMessage
+    public class ReceiveMessage : IReceiveMessage
     {
+        public IClientConnection Connection { get; private set; }
         public String Contents { get; private set; }
         public IMessageTarget Sender { get; private set; }
+        public IMessageTarget Receiver { get; private set; }
         public ReceiveType Type { get; private set; }
         public ReplyType ReplyType { get; private set; }
 
         public ReceiveMessage(IClientConnection connection, String contents, IMessageTarget sender, 
-            ReceiveType type, ReplyType replyType, params IMessageTarget[] receivers) :
-            base(connection, receivers)
+            IMessageTarget receiver, ReceiveType type, ReplyType replyType)
         {
+            Connection = connection;
             Contents = contents;
             Sender = sender;
+            Receiver = receiver;
             Type = type;
             ReplyType = replyType;
         }

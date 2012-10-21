@@ -14,7 +14,6 @@ namespace ReactiveIRC.Client
 
         private KeyedCollection<String, IChannel> _channels = new KeyedCollection<String, IChannel>();
 
-        public IObservable<IMessage> Messages { get; private set; }
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
         public IObservable<ISendMessage> SentMessages { get; private set; }
 
@@ -41,11 +40,8 @@ namespace ReactiveIRC.Client
             Away = new ObservableProperty<bool>(false);
             Name = new ObservableProperty<String>(name);
 
-            Messages = connection.Messages
-                .Where(m => m.Receivers.Contains(this))
-                ;
             ReceivedMessages = connection.ReceivedMessages
-                .Where(m => m.Receivers.Contains(this))
+                .Where(m => m.Receiver.Equals(this))
                 ;
             SentMessages = connection.SentMessages
                 .Where(m => m.Receivers.Contains(this))

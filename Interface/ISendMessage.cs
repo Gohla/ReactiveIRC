@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ReactiveIRC.Interface
 {
@@ -8,9 +9,9 @@ namespace ReactiveIRC.Interface
     public interface ISendMessage : IMessage
     {
         /// <summary>
-        /// Gets the raw contents of the message.
+        /// Gets the receivers of the message. If empty, receiver is global.
         /// </summary>
-        String Raw { get; }
+        ICollection<IMessageTarget> Receivers { get; }
 
         /// <summary>
         /// Gets the type of the message.
