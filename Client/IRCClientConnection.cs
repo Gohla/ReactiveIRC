@@ -35,6 +35,7 @@ namespace ReactiveIRC.Client
         public IObservable<IMessage> Messages { get { return _messages; } }
         public IObservable<IReceiveMessage> ReceivedMessages { get { return _receivedMessages; } }
         public IObservable<ISendMessage> SentMessages { get { return _sentMessages; } }
+        public IMessageSender MessageSender { get { return _messageSender; } }
 
         public IRCClientConnection(String address, ushort port)
             : base(address, port)

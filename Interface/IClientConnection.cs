@@ -55,6 +55,11 @@ namespace ReactiveIRC.Interface
         IObservable<ISendMessage> SentMessages { get; }
 
         /// <summary>
+        /// Gets the message sender.
+        /// </summary>
+        IMessageSender MessageSender { get; }
+
+        /// <summary>
         /// Connects to the server.
         /// </summary>
         ///
