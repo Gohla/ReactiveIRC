@@ -14,6 +14,7 @@ namespace ReactiveIRC.Client
 
         private SynchronizationContext _context;
         private SynchronizedKeyedCollection<String, IChannelUser> _users;
+        private SynchronizedKeyedCollection<String, IChannelUser> _knownUsers;
 
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
 
@@ -34,6 +35,7 @@ namespace ReactiveIRC.Client
         {
             _context = context;
             _users = new SynchronizedKeyedCollection<String, IChannelUser>(_context);
+            _knownUsers = new SynchronizedKeyedCollection<String, IChannelUser>(_context);
 
             Connection = connection;
             Name = new ObservableProperty<String>(name);
@@ -65,7 +67,10 @@ namespace ReactiveIRC.Client
             TopicSetDate = null;
             CreatedDate.Dispose();
             CreatedDate = null;
-            _users.Do(u => u.Dispose());
+            _knownUsers.Do(u => u.Dispose());
+            _knownUsers.Clear();
+            _knownUsers.Dispose();
+            _knownUsers = null;
             _users.Clear();
             _users.Dispose();
             _users = null;
@@ -76,50 +81,74 @@ namespace ReactiveIRC.Client
             return _users.Contains(nickname);
         }
 
+        private bool ContainsKnownUser(String nickname)
+        {
+            return _knownUsers.Contains(nickname);
+        }
+
         public IChannelUser GetUser(String nickname)
         {
-            if(ContainsUser(nickname))
-                return _users[nickname];
+            if(ContainsKnownUser(nickname))
+                return _knownUsers[nickname];
 
             IUser user = Connection.GetUser(nickname);
-            return AddUser(user);
+            return AddKnownUser(user);
         }
 
         internal ChannelUser AddUser(IUser user)
         {
-            if(_users.Contains(user.Name))
+            if(ContainsUser(user.Name))
                 return _users[user.Name] as ChannelUser;
 
-            ChannelUser channelUser = new ChannelUser(Connection, this, user);
+            ChannelUser channelUser;
+            if(ContainsKnownUser(user.Name))
+                channelUser = _knownUsers[user.Name] as ChannelUser;
+            else
+            {
+                channelUser = new ChannelUser(Connection, this, user);
+                _knownUsers.Add(channelUser);
+            }
+
             _users.Add(channelUser);
+            return channelUser;
+        }
+
+        private ChannelUser AddKnownUser(IUser user)
+        {
+            ChannelUser channelUser = new ChannelUser(Connection, this, user);
+            _knownUsers.Add(channelUser);
             return channelUser;
         }
 
         internal bool RemoveUser(String nickname)
         {
-            if(!_users.Contains(nickname))
+            if(!ContainsUser(nickname))
             {
                 _logger.Error("Trying to remove user " + nickname + " from channel " + Name +
                     ", but user does not exist in this channel.");
                 return false;
             }
 
-            return _users.Remove(nickname);
+            _users.Remove(nickname);
+            _knownUsers.Remove(nickname);
+            return true;
         }
 
         internal void ChangeName(String oldNickname, String newNickname)
         {
-            if(_users.Contains(newNickname))
+            if(ContainsUser(newNickname))
             {
                 _logger.Error("Changing nickname " + oldNickname + " into " + newNickname +
                     ", but a channel user with that nickname already exists. Some observable subscriptions may be lost.");
 
                 _users.Remove(oldNickname);
+                _knownUsers.Remove(oldNickname);
                 return;
             }
 
             IChannelUser channelUser = _users[oldNickname];
             _users.ChangeItemKey(channelUser, newNickname);
+            _knownUsers.ChangeItemKey(channelUser, newNickname);
         }
 
         public int CompareTo(IChannel other)

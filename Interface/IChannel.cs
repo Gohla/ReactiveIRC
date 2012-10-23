@@ -45,11 +45,6 @@ namespace ReactiveIRC.Interface
         ObservableProperty<uint> CreatedDate { get; }
 
         /// <summary>
-        /// Gets the channel user with given nickname.
-        /// </summary>
-        IChannelUser GetUser(String nickname);
-
-        /// <summary>
         /// Query if the channel contains the user with given nickname.
         /// </summary>
         ///
@@ -59,5 +54,16 @@ namespace ReactiveIRC.Interface
         /// True if channel contains the user, false if not.
         /// </returns>
         bool ContainsUser(String nickname);
+
+        /// <summary>
+        /// Gets the channel user with given nickname.
+        /// </summary>
+        ///
+        /// <param name="nickname">The nickname.</param>
+        ///
+        /// <returns>
+        /// The channel user.
+        /// </returns>
+        IChannelUser GetUser(String nickname);
     }
 }

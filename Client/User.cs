@@ -15,6 +15,7 @@ namespace ReactiveIRC.Client
 
         private SynchronizationContext _context;
         private SynchronizedKeyedCollection<String, IChannel> _channels;
+        private SynchronizedKeyedCollection<String, IChannel> _knownChannels;
 
         public IObservable<IReceiveMessage> ReceivedMessages { get; private set; }
         public IObservable<IReceiveMessage> SentMessages { get; private set; }
@@ -36,6 +37,7 @@ namespace ReactiveIRC.Client
         {
             _context = context;
             _channels = new SynchronizedKeyedCollection<String, IChannel>(_context);
+            _knownChannels = new SynchronizedKeyedCollection<String, IChannel>(_context);
 
             Connection = connection;
             Identity = new Identity(name, null, null);
@@ -70,29 +72,59 @@ namespace ReactiveIRC.Client
             RealName = null;
             Identity.Dispose();
             Identity = null;
+            _knownChannels.Clear();
+            _knownChannels.Dispose();
+            _knownChannels = null;
             _channels.Clear();
             _channels.Dispose();
             _channels = null;
         }
 
+        public bool ContainsChannel(String channelName)
+        {
+            return _channels.Contains(channelName);
+        }
+
+        private bool ContainsKnownChannel(String channelName)
+        {
+            return _knownChannels.Contains(channelName);
+        }
+
+        public IChannel GetChannel(String channelName)
+        {
+            if(ContainsKnownChannel(channelName))
+                return _knownChannels[channelName];
+
+            IChannel channel = Connection.GetChannel(channelName);
+            _knownChannels.Add(channel);
+            return channel;
+        }
+
         internal void AddChannel(IChannel channel)
         {
-            if(_channels.Contains(channel.Name))
+            if(ContainsChannel(channel.Name))
                 return;
+
+            if(!ContainsKnownChannel(channel.Name))
+            {
+                _knownChannels.Add(channel);
+            }
 
             _channels.Add(channel);
         }
 
-        internal bool RemoveChannel(String channel)
+        internal bool RemoveChannel(String channelName)
         {
-            if(!_channels.Contains(channel))
+            if(!ContainsChannel(channelName))
             {
-                _logger.Error("Trying to remove channel " + channel + " from user " + Name +
+                _logger.Error("Trying to remove channel " + channelName + " from user " + Name +
                     ", but user is not in this channel.");
                 return false;
             }
 
-            return _channels.Remove(channel);
+            _channels.Remove(channelName);
+            _knownChannels.Remove(channelName);
+            return true;
         }
 
         public int CompareTo(IUser other)

@@ -48,5 +48,27 @@ namespace ReactiveIRC.Interface
         /// changes.
         /// </summary>
         ObservableProperty<bool> Away { get; }
+
+        /// <summary>
+        /// Query if the user is in a channel with given name.
+        /// </summary>
+        ///
+        /// <param name="channelName">The name of the channel.</param>
+        ///
+        /// <returns>
+        /// True if user is in channel with given name, false if not.
+        /// </returns>
+        bool ContainsChannel(String channelName);
+
+        /// <summary>
+        /// Gets the channel with given name.
+        /// </summary>
+        ///
+        /// <param name="channelName">The name of the channel.</param>
+        ///
+        /// <returns>
+        /// The channel.
+        /// </returns>
+        IChannel GetChannel(String channelName);
     }
 }
