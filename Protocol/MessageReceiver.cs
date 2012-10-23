@@ -204,7 +204,13 @@ namespace ReactiveIRC.Protocol
                 if(results.Groups[2].Success)
                     message = results.Groups[2].Value;
 
-                return new ReceiveMessage(Connection, message, sender, receiver, type, ReplyType.Unknown);
+                IMessageTarget realSender = sender;
+                if(sender.Type == MessageTargetType.User && receiver.Type == MessageTargetType.Channel)
+                {
+                    IChannel channel = receiver as IChannel;
+                    realSender = channel.GetUser(sender.Name);
+                }
+                return new ReceiveMessage(Connection, message, realSender, receiver, type, ReplyType.Unknown);
             }
             return null;
         }

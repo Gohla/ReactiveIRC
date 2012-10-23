@@ -298,11 +298,11 @@ namespace ReactiveIRC.Client
 
         private void HandleJoin(IReceiveMessage message)
         {
-            User user = message.Sender as User;
+            ChannelUser channelUser = message.Sender as ChannelUser;
             Channel channel = message.Receiver as Channel;
-            AddUserToChannel(user, channel);
+            AddUserToChannel(channelUser.User as User, channel);
 
-            if(_me.Equals(user))
+            if(_me.Equals(channelUser.User))
             {
                 SendAndForget(
                     _messageSender.Mode(channel)
@@ -311,15 +311,15 @@ namespace ReactiveIRC.Client
             }
             else
             {
-                SendAndForget(_messageSender.Who(user.Name));
+                SendAndForget(_messageSender.Who(channelUser.Name));
             }
         }
 
         private void HandlePart(IReceiveMessage message)
         {
-            User user = message.Sender as User;
+            ChannelUser channelUser = message.Sender as ChannelUser;
             Channel channel = message.Receiver as Channel;
-            RemoveUserFromChannel(user, channel);
+            RemoveUserFromChannel(channelUser.User as User, channel);
         }
 
         private void HandleKick(IReceiveMessage message)
