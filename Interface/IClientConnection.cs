@@ -120,10 +120,10 @@ namespace ReactiveIRC.Interface
         IObservable<Unit> Login(String nickname, String username, String realname, String password);
 
         /// <summary>
-        /// Gets the network with given name. 
+        /// Gets the network with given name. If network was not known before, it is added to the known networks.
         /// </summary>
         ///
-        /// <param name="name">The network name.</param>
+        /// <param name="network">The network name.</param>
         INetwork GetNetwork(String network);
 
         /// <summary>
@@ -134,10 +134,31 @@ namespace ReactiveIRC.Interface
         IChannel GetChannel(String channel);
 
         /// <summary>
-        /// Gets the user with given nickname.  If user was not known before, it is added to the known users.
+        /// Gets the user with given nickname. If user was not known before, it is added to the known users.
         /// </summary>
         ///
         /// <param name="nickname">The nickname of the user.</param>
         IUser GetUser(String nickname);
+
+        /// <summary>
+        /// Gets the network with given name. Returns null if not found.
+        /// </summary>
+        ///
+        /// <param name="network">The network name.</param>
+        INetwork GetExistingNetwork(String network);
+
+        /// <summary>
+        /// Gets the channel with given name. Returns null if not found.
+        /// </summary>
+        ///
+        /// <param name="channel">The name of the channel.</param>
+        IChannel GetExistingChannel(String channel);
+
+        /// <summary>
+        /// Gets the user with given nickname. Returns null if not found.
+        /// </summary>
+        ///
+        /// <param name="nickname">The nickname of the user.</param>
+        IUser GetExistingUser(String nickname);
     }
 }

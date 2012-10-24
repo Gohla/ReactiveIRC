@@ -59,6 +59,11 @@ namespace ReactiveIRC.Client
             _disposables.Add(_receivedMessages.Subscribe(_messages));
             _disposables.Add(_sentMessages.Subscribe(_messages));
 
+            _disposables.Add(_sentMessages
+                .Where(m => m.Type == SendType.Privmsg || m.Type == SendType.Notice)
+                .Subscribe(m => HandleMessage(m))
+            );
+
             _disposables.Add(_receivedMessages
                 .Where(m => m.Type == ReceiveType.Ping)
                 .Subscribe(HandlePing)
@@ -240,6 +245,27 @@ namespace ReactiveIRC.Client
             return user;
         }
 
+        public INetwork GetExistingNetwork(String networkName)
+        {
+            if(!_networks.Contains(networkName))
+                return null;
+            return _networks[networkName];
+        }
+
+        public IChannel GetExistingChannel(String channelName)
+        {
+            if(!_channels.Contains(channelName))
+                return null;
+            return _channels[channelName];
+        }
+
+        public IUser GetExistingUser(String nickname)
+        {
+            if(!_users.Contains(nickname))
+                return null;
+            return _users[nickname];
+        }
+
         private ChannelUser AddUserToChannel(String nickname, String channelName)
         {
             User user = GetChannel(nickname) as User;
@@ -289,6 +315,11 @@ namespace ReactiveIRC.Client
             user.Channels.Cast<Channel>().Do(c => c.ChangeName(user.Name, nickname));
             user.Name.Value = nickname;
             user.Identity.Name.Value = nickname;
+        }
+
+        private void HandleMessage(ISendMessage message)
+        {
+            _receivedMessages.OnNext(_messageReceiver.Receive(_me.Identity, message.Contents));
         }
 
         private void HandlePing(IReceiveMessage message)

@@ -44,7 +44,7 @@ namespace ReactiveIRC.Protocol
 
         public ISendMessage Action(IMessageTarget receiver, String action)
         {
-            return Message(receiver, '\x001' + "ACTION" + action + '\x001');
+            return Message(receiver, '\x001' + "ACTION " + action + '\x001');
         }
 
         public ISendMessage Notice(IMessageTarget receiver, String message)
