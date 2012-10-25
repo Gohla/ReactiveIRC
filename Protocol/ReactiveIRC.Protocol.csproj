@@ -36,10 +36,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Gohla.Shared, Version=1.0.4676.37502, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Gohla.Shared\Gohla.Shared\bin\Debug\Gohla.Shared.dll</HintPath>
-    </Reference>
     <Reference Include="NLog">
       <HintPath>..\packages\NLog.2.0.0.2000\lib\net40\NLog.dll</HintPath>
     </Reference>
@@ -73,6 +69,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Gohla.Shared\Gohla.Shared\Gohla.Shared.csproj">
+      <Project>{6E1A3F05-4A08-41A0-BAB7-A1B6F3315E2A}</Project>
+      <Name>Gohla.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Interface\ReactiveIRC.Interface.csproj">
       <Project>{c699bffa-5fe2-441c-9679-59bead165bc6}</Project>
       <Name>ReactiveIRC.Interface</Name>
