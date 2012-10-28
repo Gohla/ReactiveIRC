@@ -5,11 +5,11 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using Gohla.Shared;
 using NLog;
 using ReactiveIRC.Interface;
 using ReactiveIRC.Protocol;
-using System.Threading;
 
 namespace ReactiveIRC.Client
 {
@@ -19,6 +19,7 @@ namespace ReactiveIRC.Client
         protected static readonly String _initialNickname = "***initial***";
 
         private SynchronizationContext _context;
+        private Client _client;
         private MessageSender _messageSender;
         private MessageReceiver _messageReceiver;
         private User _me;
@@ -30,6 +31,7 @@ namespace ReactiveIRC.Client
         private Subject<ISendMessage> _sentMessages = new Subject<ISendMessage>();
         private CompositeDisposable _disposables = new CompositeDisposable();
 
+        public IClient Client { get { return _client; } }
         public IUser Me { get { return _me; } }
         public IObservableCollection<INetwork> Networks { get { return _networks; } }
         public IObservableCollection<IChannel> Channels { get { return _channels; } }
@@ -39,10 +41,11 @@ namespace ReactiveIRC.Client
         public IObservable<ISendMessage> SentMessages { get { return _sentMessages; } }
         public IMessageSender MessageSender { get { return _messageSender; } }
 
-        public IRCClientConnection(String address, ushort port, SynchronizationContext context)
+        public IRCClientConnection(String address, ushort port, SynchronizationContext context, Client client)
             : base(address, port)
         {
             _context = context;
+            _client = client;
             _networks = new SynchronizedKeyedCollection<String, INetwork>(_context);
             _channels = new SynchronizedKeyedCollection<String, IChannel>(_context);
             _users = new SynchronizedKeyedCollection<String, IUser>(_context);

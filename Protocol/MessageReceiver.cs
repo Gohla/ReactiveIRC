@@ -33,20 +33,22 @@ namespace ReactiveIRC.Protocol
         private static readonly Regex CtcpReplyRegex = new Regex("^NOTICE ([^: ]*?) :" + "\x1" + "(.*)" + "\x1" + "$",
             RegexOptions.Compiled);
 
+        public IClient Client { get; private set; }
         public IClientConnection Connection { get; private set; }
 
         public MessageReceiver(IClientConnection connection)
         {
             Connection = connection;
+            Client = connection.Client;
         }
 
-        public ReceiveMessage Receive(IIdentity identity, String commandParams)
+        public IReceiveMessage Receive(IIdentity identity, String commandParams)
         {
             String identityString = identity.Name + "!" + identity.Ident + "@" + identity.Host;
             return Receive(":" + identityString + " " + commandParams);
         }
 
-        public ReceiveMessage Receive(String raw)
+        public IReceiveMessage Receive(String raw)
         {
             if(raw == null)
                 throw new ArgumentNullException("raw");
@@ -61,7 +63,7 @@ namespace ReactiveIRC.Protocol
                 line = raw;
 
             // Try to parse messages without prefixes.
-            ReceiveMessage message = ParseNoPrefixMessage(line);
+            IReceiveMessage message = ParseNoPrefixMessage(line);
             if(message != null) return message;
 
             // Tokenize
@@ -130,9 +132,9 @@ namespace ReactiveIRC.Protocol
             return Tuple.Create(ReceiveType.Unknown, ReplyType.Unknown);
         }
 
-        private ReceiveMessage ParseNoPrefixMessage(String line)
+        private IReceiveMessage ParseNoPrefixMessage(String line)
         {
-            ReceiveMessage message = null;
+            IReceiveMessage message = null;
 
             message = ParseUndirectedMessage(PingRegex, ReceiveType.Ping, Connection.Me.Network.Value, line, 
                 Connection.Me);
@@ -144,15 +146,15 @@ namespace ReactiveIRC.Protocol
             return message;
         }
 
-        private ReceiveMessage ParseInformationMessage(IMessageTarget sender, ReceiveType type, ReplyType replyType, 
+        private IReceiveMessage ParseInformationMessage(IMessageTarget sender, ReceiveType type, ReplyType replyType, 
             String parameters)
         {
-            return new ReceiveMessage(Connection, parameters, sender, Connection.Me, type, replyType);
+            return Client.CreateReceiveMessage(Connection, parameters, sender, Connection.Me, type, replyType);
         }
 
-        private ReceiveMessage ParseMessage(IMessageTarget sender, String line)
+        private IReceiveMessage ParseMessage(IMessageTarget sender, String line)
         {
-            ReceiveMessage message = null;
+            IReceiveMessage message = null;
 
             message = ParseDirectedMessage(ActionRegex, ReceiveType.Action, sender, line);
             if(message != null) return message;
@@ -181,11 +183,11 @@ namespace ReactiveIRC.Protocol
             message = ParseInviteMessage(sender, line);
             if(message != null) return message;
 
-            return new ReceiveMessage(Connection, line, sender, Connection.Me.Network.Value, ReceiveType.Unknown, 
+            return Client.CreateReceiveMessage(Connection, line, sender, Connection.Me.Network.Value, ReceiveType.Unknown, 
                 ReplyType.Unknown);
         }
 
-        private ReceiveMessage ParseUndirectedMessage(Regex regex, ReceiveType type, IMessageTarget sender, String line,
+        private IReceiveMessage ParseUndirectedMessage(Regex regex, ReceiveType type, IMessageTarget sender, String line,
             IMessageTarget receiver)
         {
             Match results = regex.Match(line);
@@ -195,12 +197,12 @@ namespace ReactiveIRC.Protocol
                 if(results.Groups[1].Success)
                     message = results.Groups[1].Value;
 
-                return new ReceiveMessage(Connection, message, sender, receiver, type, ReplyType.Unknown);
+                return Client.CreateReceiveMessage(Connection, message, sender, receiver, type, ReplyType.Unknown);
             }
             return null;
         }
 
-        private ReceiveMessage ParseDirectedMessage(Regex regex, ReceiveType type, IMessageTarget sender, String line)
+        private IReceiveMessage ParseDirectedMessage(Regex regex, ReceiveType type, IMessageTarget sender, String line)
         {
             Match results = regex.Match(line);
             if(results.Success && results.Groups[1].Success)
@@ -217,12 +219,12 @@ namespace ReactiveIRC.Protocol
                     IChannel channel = receiver as IChannel;
                     realSender = channel.GetUser(sender.Name);
                 }
-                return new ReceiveMessage(Connection, message, realSender, receiver, type, ReplyType.Unknown);
+                return Client.CreateReceiveMessage(Connection, message, realSender, receiver, type, ReplyType.Unknown);
             }
             return null;
         }
 
-        private ReceiveMessage ParseKickMessage(IMessageTarget sender, String line)
+        private IReceiveMessage ParseKickMessage(IMessageTarget sender, String line)
         {
             Match results = KickRegex.Match(line);
             if(results.Success && results.Groups[1].Success && results.Groups[2].Success)
@@ -235,12 +237,12 @@ namespace ReactiveIRC.Protocol
                 IChannel channel = Connection.GetChannel(channelName);
                 IChannelUser channelUser = channel.GetUser(userName);
 
-                return new ReceiveMessage(Connection, message, sender, channelUser, ReceiveType.Kick, ReplyType.Unknown);
+                return Client.CreateReceiveMessage(Connection, message, sender, channelUser, ReceiveType.Kick, ReplyType.Unknown);
             }
             return null;
         }
 
-        private ReceiveMessage ParseModeMessage(IMessageTarget sender, String line)
+        private IReceiveMessage ParseModeMessage(IMessageTarget sender, String line)
         {
             Match results = ModeRegex.Match(line);
             if(results.Success && results.Groups[1].Success)
@@ -253,12 +255,12 @@ namespace ReactiveIRC.Protocol
 
                 ReceiveType type = receiver.Type == MessageTargetType.Channel ? ReceiveType.ChannelModeChange : 
                     ReceiveType.UserModeChange;
-                return new ReceiveMessage(Connection, message, sender, receiver, type, ReplyType.Unknown);
+                return Client.CreateReceiveMessage(Connection, message, sender, receiver, type, ReplyType.Unknown);
             }
             return null;
         }
 
-        private ReceiveMessage ParseInviteMessage(IMessageTarget sender, String line)
+        private IReceiveMessage ParseInviteMessage(IMessageTarget sender, String line)
         {
             Match results = InviteRegex.Match(line);
             if(results.Success && results.Groups[1].Success && results.Groups[2].Success)
@@ -267,7 +269,7 @@ namespace ReactiveIRC.Protocol
                 String channelName = results.Groups[2].Value;
                 IChannel channel = Connection.GetChannel(channelName);
 
-                return new ReceiveMessage(Connection, userName, sender, channel, ReceiveType.Invite, ReplyType.Unknown);
+                return Client.CreateReceiveMessage(Connection, userName, sender, channel, ReceiveType.Invite, ReplyType.Unknown);
             }
             return null;
         }

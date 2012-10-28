@@ -9,6 +9,8 @@ namespace ReactiveIRC.Interface
     /// </summary>
     public interface IClientConnection : IDisposable, IEquatable<IClientConnection>, IComparable<IClientConnection>
     {
+        IClient Client { get; }
+
         /// <summary>
         /// Gets the server address.
         /// </summary>

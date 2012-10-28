@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Channel.cs" />
     <Compile Include="ChannelUser.cs" />
+    <Compile Include="Client.cs" />
     <Compile Include="IRCClientConnection.cs" />
     <Compile Include="Network.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
