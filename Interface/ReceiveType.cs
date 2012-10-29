@@ -9,7 +9,7 @@
       , Reply               // {INetwork}                       -> {Me}
       , Error               // {INetwork}                       -> {Me}
       , Ping                // {INetwork}                       -> {Me}
-      , Echo                // {Me}                             -> {INetwork, IUser, IChannel, IChannelUser}
+      , Echo                // {Me}                             -> {IMessageTarget}
       , Message	            // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
       , Action              // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
       , Notice              // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
@@ -17,10 +17,10 @@
       , Join                // {IChannelUser}                   -> {IChannel}. 
       , Part                // {IChannelUser}                   -> {IChannel}. 
       , Kick                // {IChannelUser, INetwork}         -> {IChannelUser}. 
-      , Quit                // {IUser}                          -> {INetwork}.
+      , Quit                // {IUser}                          -> {IUser, IChannel, INetwork}.
       , TopicChange         // {IChannelUser, IUser, INetwork}  -> {IChannel}. 
-      , NickChange          // {IUser}                          -> {INetwork}. 
-      , UserModeChange      // {IUser, INetwork}                -> {IUser}
+      , NickChange          // {IUser}                          -> {IUser, IChannel, INetwork}. 
+      , UserModeChange      // {IUser, INetwork}                -> {Me?}
       , ChannelModeChange   // {IChannelUser, IUser, INetwork}  -> {IChannel}
     }
 }

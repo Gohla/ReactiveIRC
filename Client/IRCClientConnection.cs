@@ -27,6 +27,7 @@ namespace ReactiveIRC.Client
         private SynchronizedKeyedCollection<String, IChannel> _channels;
         private SynchronizedKeyedCollection<String, IUser> _users;
         private Subject<IMessage> _messages = new Subject<IMessage>();
+        private Subject<IReceiveMessage> _internalReceivedMessages = new Subject<IReceiveMessage>();
         private Subject<IReceiveMessage> _receivedMessages = new Subject<IReceiveMessage>();
         private Subject<ISendMessage> _sentMessages = new Subject<ISendMessage>();
         private CompositeDisposable _disposables = new CompositeDisposable();
@@ -57,82 +58,86 @@ namespace ReactiveIRC.Client
 
             _disposables.Add(RawMessages
                 .Select(r => _messageReceiver.Receive(r))
-                .Subscribe(_receivedMessages)
+                .Subscribe(_internalReceivedMessages)
                 );
+            _disposables.Add(_internalReceivedMessages.Subscribe(_receivedMessages));
             _disposables.Add(_receivedMessages.Subscribe(_messages));
             _disposables.Add(_sentMessages.Subscribe(_messages));
-
             _disposables.Add(_sentMessages
                 .Where(m => m.Type == SendType.Privmsg || m.Type == SendType.Notice)
                 .Subscribe(m => HandleMessage(m))
             );
 
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.Type == ReceiveType.Ping)
                 .Subscribe(HandlePing)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.Type == ReceiveType.Join)
                 .Subscribe(HandleJoin)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.Type == ReceiveType.Part)
                 .Subscribe(HandlePart)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.Type == ReceiveType.Kick)
                 .Subscribe(HandleKick)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.Type == ReceiveType.Quit)
                 .Subscribe(HandleQuit)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
+                .Where(m => m.Type == ReceiveType.NickChange)
+                .Subscribe(HandleNickChange)
+                );
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.Type == ReceiveType.TopicChange)
                 .Subscribe(HandleTopicChange)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.Type == ReceiveType.ChannelModeChange)
                 .Subscribe(HandleChannelModeChange)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.Type == ReceiveType.UserModeChange)
                 .Subscribe(HandleUserModeChange)
                 );
 
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.ReplyType == ReplyType.Welcome)
                 .Subscribe(HandleWelcome)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.ReplyType == ReplyType.ChannelModeIs)
                 .Subscribe(HandleChannelModeIsReply)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.ReplyType == ReplyType.CreatedAt)
                 .Subscribe(HandleCreatedAtReply)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.ReplyType == ReplyType.Topic)
                 .Subscribe(HandleTopicReply)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.ReplyType == ReplyType.TopicSetBy)
                 .Subscribe(HandleTopicSetByReply)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.ReplyType == ReplyType.NamesReply)
                 .Subscribe(HandleNamesReply)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.ReplyType == ReplyType.WhoReply)
                 .Subscribe(HandleWhoReply)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.ReplyType == ReplyType.Away)
                 .Subscribe(HandleAwayReply)
                 );
-            _disposables.Add(_receivedMessages
+            _disposables.Add(_internalReceivedMessages
                 .Where(m => m.ReplyType == ReplyType.UnAway)
                 .Subscribe(HandleUnAwayReply)
                 );
@@ -149,9 +154,9 @@ namespace ReactiveIRC.Client
             _sentMessages.OnCompleted();
             _sentMessages.Dispose();
             _sentMessages = null;
-            _receivedMessages.OnCompleted();
-            _receivedMessages.Dispose();
-            _receivedMessages = null;
+            _internalReceivedMessages.OnCompleted();
+            _internalReceivedMessages.Dispose();
+            _internalReceivedMessages = null;
             _messages.OnCompleted();
             _messages.Dispose();
             _messages = null;
@@ -366,8 +371,25 @@ namespace ReactiveIRC.Client
         {
             User user = message.Sender as User;
             Channel[] channels = user.Channels.Cast<Channel>().ToArray();
-            channels.Do(c => RemoveUserFromChannel(user, c));
+            foreach(Channel channel in channels)
+            {
+                _receivedMessages.OnNext(_client.CreateReceiveMessage(this, message.Contents, message.Date,
+                    message.Sender, channel, message.Type, message.ReplyType));
+                RemoveUserFromChannel(user, channel);
+            }
             _users.Remove(user);
+        }
+
+        private void HandleNickChange(IReceiveMessage message)
+        {
+            User user = message.Sender as User;
+            foreach(IChannel channel in user.Channels)
+            {
+                _receivedMessages.OnNext(_client.CreateReceiveMessage(this, message.Contents, message.Date,
+                    message.Sender, channel, message.Type, message.ReplyType));
+            }
+
+            ChangeNickname(user, message.Contents);
         }
 
         private void HandleTopicChange(IReceiveMessage message)
