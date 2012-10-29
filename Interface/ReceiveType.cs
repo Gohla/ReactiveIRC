@@ -9,6 +9,7 @@
       , Reply               // {INetwork}                       -> {Me}
       , Error               // {INetwork}                       -> {Me}
       , Ping                // {INetwork}                       -> {Me}
+      , Echo                // {Me}                             -> {INetwork, IUser, IChannel, IChannelUser}
       , Message	            // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
       , Action              // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 
       , Notice              // {IChannelUser, IUser, INetwork}  -> {IUser, IChannel}. 

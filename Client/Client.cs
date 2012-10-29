@@ -12,10 +12,10 @@ namespace ReactiveIRC.Client
             return new IRCClientConnection(address, port, context, this);
         }
 
-        public IReceiveMessage CreateReceiveMessage(IClientConnection connection, String contents, 
+        public IReceiveMessage CreateReceiveMessage(IClientConnection connection, String contents, DateTime date,
             IMessageTarget sender, IMessageTarget receiver, ReceiveType type, ReplyType replyType)
         {
-            return new ReceiveMessage(connection, contents, sender, receiver, type, replyType);
+            return new ReceiveMessage(connection, contents, date, sender, receiver, type, replyType);
         }
 
         public ISendMessage CreateSendMessage(IClientConnection connection, String contents, SendType type, 

@@ -56,6 +56,15 @@ namespace ReactiveIRC.Protocol
             return new Identity(name, ident, host);
         }
 
+        public static bool TryParse(String str, out IIdentity identity)
+        {
+            identity = Parse(str);
+            if(identity == null)
+                return false;
+            else
+                return true;
+        }
+
         public int CompareTo(IIdentity other)
         {
             if(ReferenceEquals(other, null))
