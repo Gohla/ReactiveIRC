@@ -5,11 +5,14 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
+using NLog;
 
 namespace ReactiveIRC.Client
 {
     public class RawClientConnection : IDisposable
     {
+        protected static readonly Logger _logger = NLog.LogManager.GetLogger("RawClientConnection");
+
         private TcpClient _socket = new TcpClient();
         private Subject<String> _rawMessages = new Subject<String>();
         private IDisposable _rawMessagesSubscription;
@@ -73,6 +76,8 @@ namespace ReactiveIRC.Client
         private void Connected()
         {
             _rawMessagesSubscription = _socket.Client.ReceiveUntilCompleted(SocketFlags.None)
+                .Do(_ => { }, e => _logger.ErrorException("Error receiving: ", e), 
+                    () => _logger.Error("Receive observable completed."))
                 .SelectMany(x => Encoding.UTF8.GetString(x).ToCharArray())
                 .Scan(String.Empty, (a, b) => (a.EndsWith("\r\n") ? "" : a) + b)
                 .Where(x => x.EndsWith("\r\n"))
