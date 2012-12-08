@@ -5,42 +5,6 @@ namespace ReactiveIRC.Interface
     public static class ChannelExtensions
     {
         /// <summary>
-        /// Sends a message to this channel.
-        /// </summary>
-        ///
-        /// <param name="channel">The channel to act on.</param>
-        /// <param name="message">The message.</param>
-        public static void SendMessage(this IChannel channel, String message)
-        {
-            IClientConnection connection = channel.Connection;
-            connection.SendAndForget(connection.MessageSender.Message(channel, message));
-        }
-
-        /// <summary>
-        /// Sends an action to this channel.
-        /// </summary>
-        ///
-        /// <param name="channel">The channel to act on.</param>
-        /// <param name="action"> The action.</param>
-        public static void SendAction(this IChannel channel, String action)
-        {
-            IClientConnection connection = channel.Connection;
-            connection.SendAndForget(connection.MessageSender.Action(channel, action));
-        }
-
-        /// <summary>
-        /// Sends a notice to this channel.
-        /// </summary>
-        ///
-        /// <param name="channel">The channel to act on.</param>
-        /// <param name="notice"> The notice.</param>
-        public static void SendNotice(this IChannel channel, String notice)
-        {
-            IClientConnection connection = channel.Connection;
-            connection.SendAndForget(connection.MessageSender.Notice(channel, notice));
-        }
-
-        /// <summary>
         /// Sets the topic for this channel.
         /// </summary>
         ///
