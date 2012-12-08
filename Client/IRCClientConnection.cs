@@ -15,7 +15,7 @@ namespace ReactiveIRC.Client
 {
     public class IRCClientConnection : RawClientConnection, IClientConnection
     {
-        protected static readonly Logger _logger = NLog.LogManager.GetLogger("IRCClientConnection");
+        protected new static readonly Logger _logger = NLog.LogManager.GetLogger("IRCClientConnection");
         protected static readonly String _initialNickname = "***initial***";
 
         private SynchronizationContext _context;
