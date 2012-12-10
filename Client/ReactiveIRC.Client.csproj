@@ -40,9 +40,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NLog.2.0.0.2000\lib\net40\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="Rxx">
-      <HintPath>..\..\rxx\Source\Rxx\bin\Debug\Rxx.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Reactive.Core, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=f300afd708cefcd3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -69,6 +66,12 @@
     <Compile Include="Network.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RawClientConnection.cs" />
+    <Compile Include="Socket\ObservableSocket - Connection.cs" />
+    <Compile Include="Socket\SocketAsyncEventArgsExtensions.cs" />
+    <Compile Include="Socket\SocketExtensions - Connection.cs" />
+    <Compile Include="Socket\SocketExtensions - Receive.cs" />
+    <Compile Include="Socket\SocketExtensions - Send.cs" />
+    <Compile Include="Socket\TcpClientExtensions.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
