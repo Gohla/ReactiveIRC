@@ -60,6 +60,7 @@
     <Compile Include="IChannelUser.cs" />
     <Compile Include="IClient.cs" />
     <Compile Include="IClientConnection.cs" />
+    <Compile Include="IdentityMask.cs" />
     <Compile Include="IIdentity.cs" />
     <Compile Include="IMessage.cs" />
     <Compile Include="IMessageSender.cs" />
