@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using ReactiveIRC.Interface;
 
 namespace ReactiveIRC.Protocol
@@ -97,7 +93,6 @@ namespace ReactiveIRC.Protocol
             if(!String.IsNullOrWhiteSpace(identity.Name.Value))
             {
                 IUser user = Connection.GetUser(identity.Name);
-                // TODO: Is setting host and ident necessary?
                 user.Identity.Host.Value = identity.Host;
                 user.Identity.Ident.Value = identity.Ident;
                 return user;

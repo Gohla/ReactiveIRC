@@ -93,9 +93,9 @@ namespace ReactiveIRC.Protocol
                 return false;
 
             return
-                EqualityComparer<String>.Default.Equals(this.Name, other.Name)
-             && EqualityComparer<String>.Default.Equals(this.Ident, other.Ident)
-             && EqualityComparer<String>.Default.Equals(this.Host, other.Host)
+                EqualityComparer<String>.Default.Equals(this.Name.Value, other.Name.Value)
+             && EqualityComparer<String>.Default.Equals(this.Ident.Value, other.Ident.Value)
+             && EqualityComparer<String>.Default.Equals(this.Host.Value, other.Host.Value)
              ;
         }
 
@@ -104,16 +104,23 @@ namespace ReactiveIRC.Protocol
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name);
-                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Ident);
-                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Host);
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name.Value);
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Ident.Value);
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Host.Value);
                 return hash;
             }
         }
 
-        public override string ToString()
+        public override String ToString()
         {
-            return this.Name;
+            return String.Concat
+            (
+                ((Name.Value) ?? String.Empty)
+              , (Ident.Value != null || Host.Value != null ? "!" : String.Empty)
+              , ((Ident.Value) ?? String.Empty)
+              , (Host.Value != null ? "@" : String.Empty)
+              , ((Host.Value) ?? String.Empty)
+            );
         }
     }
 }
