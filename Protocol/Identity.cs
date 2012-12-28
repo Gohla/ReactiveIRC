@@ -105,8 +105,8 @@ namespace ReactiveIRC.Protocol
             {
                 int hash = 17;
                 hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name.Value);
-                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Ident.Value);
-                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Host.Value);
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Ident.Value ?? String.Empty);
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Host.Value  ?? String.Empty);
                 return hash;
             }
         }
@@ -116,9 +116,9 @@ namespace ReactiveIRC.Protocol
             return String.Concat
             (
                 ((Name.Value) ?? String.Empty)
-              , (Ident.Value != null || Host.Value != null ? "!" : String.Empty)
+              , (Name.Value != null && (Ident.Value != null || Host.Value != null) ? "!" : String.Empty)
               , ((Ident.Value) ?? String.Empty)
-              , (Host.Value != null ? "@" : String.Empty)
+              , (((Name.Value != null || Ident.Value != null) && (Host.Value != null)) ? "@" : String.Empty)
               , ((Host.Value) ?? String.Empty)
             );
         }

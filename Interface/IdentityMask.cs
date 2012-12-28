@@ -171,11 +171,14 @@ namespace ReactiveIRC.Interface
 
         public override String ToString()
         {
-            return
-                (_name + "!")   ?? String.Empty
-              + (_ident + "@")  ?? String.Empty
-              + (_host)         ?? String.Empty
-              ;
+            return String.Concat
+            (
+                ((Name) ?? String.Empty)
+              , (Name != null && (Ident != null || Host != null) ? "!" : String.Empty)
+              , ((Ident) ?? String.Empty)
+              , (((Name != null || Ident != null) && (Host != null)) ? "@" : String.Empty)
+              , ((Host) ?? String.Empty)
+            );
         }
     }
 }
