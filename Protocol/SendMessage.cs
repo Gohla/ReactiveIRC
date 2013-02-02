@@ -6,23 +6,45 @@ namespace ReactiveIRC.Protocol
 {
     public class SendMessage : ISendMessage
     {
+        private readonly HashSet<IMessageTarget> _receivers;
+
         public IClientConnection Connection { get; private set; }
+        public String PrefixHeader { get; private set; }
         public String Contents { get; private set; }
-        public ICollection<IMessageTarget> Receivers { get; private set; }
+        public String PostfixHeader { get; private set; }
+        public IEnumerable<IMessageTarget> Receivers { get { return _receivers; } }
         public SendType Type { get; private set; }
 
-        public SendMessage(IClientConnection connection, String contents, SendType type, 
-            params IMessageTarget[] receivers)
+        public SendMessage(IClientConnection connection, String prefixHeader, String contents, String postfixHeader, 
+            SendType type, params IMessageTarget[] receivers)
         {
             Connection = connection;
+            PrefixHeader = prefixHeader;
             Contents = contents;
-            Receivers = new HashSet<IMessageTarget>(receivers);
+            PostfixHeader = postfixHeader;
+            _receivers = new HashSet<IMessageTarget>(receivers);
             Type = type;
         }
 
-        public override string ToString()
+        public SendMessage(IClientConnection connection, String prefixHeader, String contents, String postfixHeader, 
+            SendType type, IEnumerable<IMessageTarget> receivers)
         {
-            return Contents;
+            Connection = connection;
+            PrefixHeader = prefixHeader;
+            Contents = contents;
+            PostfixHeader = postfixHeader;
+            _receivers = new HashSet<IMessageTarget>(receivers);
+            Type = type;
+        }
+
+        public bool ContainsReceiver(IMessageTarget receiver)
+        {
+            return _receivers.Contains(receiver);
+        }
+
+        public override String ToString()
+        {
+            return String.Concat(PrefixHeader, Contents, PostfixHeader);
         }
     }
 }

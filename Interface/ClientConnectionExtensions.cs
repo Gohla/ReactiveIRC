@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 
 namespace ReactiveIRC.Interface
 {
@@ -7,6 +8,31 @@ namespace ReactiveIRC.Interface
     /// </summary>
     public static class ClientConnectionExtensions
     {
+        /// <summary>
+        /// Send given messages to the server. Returns an observable that must be subscribed to to actually send the
+        /// message.
+        /// </summary>
+        ///
+        /// <param name="messages">The messages to send.</param>
+        ///
+        /// <returns>
+        /// An observable stream that notifies when message is sent or has failed to send.
+        /// </returns>
+        public static IObservable<Unit> Send(this IClientConnection connection, params ISendMessage[] messages)
+        {
+            return connection.Send(messages);
+        }
+
+        /// <summary>
+        /// Send given messages to the server.
+        /// </summary>
+        ///
+        /// <param name="messages">The messages to send.</param>
+        public static void SendAndForget(this IClientConnection connection, params ISendMessage[] messages)
+        {
+            connection.SendAndForget(messages);
+        }
+
         /// <summary>
         /// Joins given channel name
         /// </summary>

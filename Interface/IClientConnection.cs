@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using Gohla.Shared;
 
@@ -89,14 +90,14 @@ namespace ReactiveIRC.Interface
         /// <returns>
         /// An observable stream that notifies when message is sent or has failed to send.
         /// </returns>
-        IObservable<Unit> Send(params ISendMessage[] messages);
+        IObservable<Unit> Send(IEnumerable<ISendMessage> messages);
 
         /// <summary>
         /// Send given messages to the server.
         /// </summary>
         ///
         /// <param name="messages">The messages to send.</param>
-        void SendAndForget(params ISendMessage[] messages);
+        void SendAndForget(IEnumerable<ISendMessage> messages);
 
         /// <summary>
         /// Logins in on the IRC server.

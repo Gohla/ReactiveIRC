@@ -174,23 +174,23 @@ namespace ReactiveIRC.Client
             base.Dispose();
         }
 
-        public IObservable<Unit> Send(params ISendMessage[] messages)
+        public IObservable<Unit> Send(IEnumerable<ISendMessage> messages)
         {
             messages.Do(m => _sentMessages.OnNext(m));
 
             return Observable.Merge(
                 messages
-                    .Select(m => WriteRaw(m.Contents))
+                    .Select(m => WriteRaw(m.ToString()))
             );
         }
 
-        public void SendAndForget(params ISendMessage[] messages)
+        public void SendAndForget(IEnumerable<ISendMessage> messages)
         {
             messages.Do(m => _sentMessages.OnNext(m));
 
             _disposables.Add(Observable.Merge(
                 messages
-                    .Select(m => WriteRaw(m.Contents))
+                    .Select(m => WriteRaw(m.ToString()))
             ).Subscribe());
         }
 
@@ -206,7 +206,7 @@ namespace ReactiveIRC.Client
 
         public IObservable<Unit> Login(String nickname, String username, String realname)
         {
-            return Send
+            return this.Send
             (
                 _messageSender.Nick(nickname)
               , _messageSender.User(username, 0, realname)
@@ -215,7 +215,7 @@ namespace ReactiveIRC.Client
 
         public IObservable<Unit> Login(String nickname, String username, String realname, String password)
         {
-            return Send
+            return this.Send
             (
                 _messageSender.Pass(password)
               , _messageSender.Nick(nickname)
@@ -332,7 +332,7 @@ namespace ReactiveIRC.Client
 
         private void HandlePing(IReceiveMessage message)
         {
-            SendAndForget(_messageSender.Pong(message.Contents));
+            this.SendAndForget(_messageSender.Pong(message.Contents));
         }
 
         private void HandleJoin(IReceiveMessage message)
@@ -343,14 +343,14 @@ namespace ReactiveIRC.Client
 
             if(_me.Equals(channelUser.User))
             {
-                SendAndForget(
+                this.SendAndForget(
                     _messageSender.Mode(channel)
                   , _messageSender.Who(channel.Name)
                 );
             }
             else
             {
-                SendAndForget(_messageSender.Who(channelUser.Name));
+                this.SendAndForget(_messageSender.Who(channelUser.Name));
             }
         }
 

@@ -55,6 +55,7 @@
     <Compile Include="ChannelUserExtensions.cs" />
     <Compile Include="ChannelUserMode.cs" />
     <Compile Include="ClientConnectionExtensions.cs" />
+    <Compile Include="ClientExtensions.cs" />
     <Compile Include="ControlCodes.cs" />
     <Compile Include="IChannel.cs" />
     <Compile Include="IChannelUser.cs" />

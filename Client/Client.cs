@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using ReactiveIRC.Interface;
 using ReactiveIRC.Protocol;
@@ -18,10 +19,16 @@ namespace ReactiveIRC.Client
             return new ReceiveMessage(connection, contents, date, sender, receiver, type, replyType);
         }
 
-        public ISendMessage CreateSendMessage(IClientConnection connection, String contents, SendType type, 
-            params IMessageTarget[] receivers)
+        public ISendMessage CreateSendMessage(IClientConnection connection, String prefixHeader, String contents, 
+            String postfixHeader, SendType type, params IMessageTarget[] receivers)
         {
-            return new SendMessage(connection, contents, type, receivers);
+            return new SendMessage(connection, prefixHeader, contents, postfixHeader, type, receivers);
+        }
+
+        public ISendMessage CreateSendMessage(IClientConnection connection, String prefixHeader, String contents, 
+            String postfixHeader, SendType type, IEnumerable<IMessageTarget> receivers)
+        {
+            return new SendMessage(connection, prefixHeader, contents, postfixHeader, type, receivers);
         }
     }
 }

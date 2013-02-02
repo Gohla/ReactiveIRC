@@ -139,33 +139,37 @@ namespace ReactiveIRC.Client
 
         public override bool Equals(object other)
         {
-            if(ReferenceEquals(other, null))
+            /*if(ReferenceEquals(other, null))
                 return false;
 
-            return Equals(other as IUser);
+            return Equals(other as IUser);*/
+
+            return this == other;
         }
 
         public bool Equals(IUser other)
         {
-            if(ReferenceEquals(other, null))
+            /*if(ReferenceEquals(other, null))
                 return false;
 
             return
                 EqualityComparer<String>.Default.Equals(this.Name, other.Name)
              && EqualityComparer<IClientConnection>.Default.Equals(this.Connection, other.Connection)
-             ;
+             ;*/
+
+            return this == other;
         }
 
-        public override int GetHashCode()
+        /*public override int GetHashCode()
         {
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name);
+                hash = hash * 23 + EqualityComparer<String>.Default.GetHashCode(this.Name.Value);
                 hash = hash * 23 + EqualityComparer<IClientConnection>.Default.GetHashCode(this.Connection);
                 return hash;
             }
-        }
+        }*/
 
         public override string ToString()
         {

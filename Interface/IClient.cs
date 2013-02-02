@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace ReactiveIRC.Interface
@@ -8,7 +9,7 @@ namespace ReactiveIRC.Interface
         IClientConnection CreateClientConnection(String address, ushort port, SynchronizationContext context);
         IReceiveMessage CreateReceiveMessage(IClientConnection connection, String contents, DateTime date, 
             IMessageTarget sender, IMessageTarget receiver, ReceiveType type, ReplyType replyType);
-        ISendMessage CreateSendMessage(IClientConnection connection, String contents, SendType type,
-            params IMessageTarget[] receivers);
+        ISendMessage CreateSendMessage(IClientConnection connection, String prefixHeader, String contents, 
+            String postfixHeader, SendType type, IEnumerable<IMessageTarget> receivers);
     }
 }
